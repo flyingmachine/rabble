@@ -11,6 +11,7 @@
 (defresource query [params]
   :available-media-types ["application/json"]
   :handle-ok (fn [_]
-               (sort-by :name
-                        (map record
-                             (dj/all :tag/name)))))
+               (->> :tag/name
+                    dj/all
+                    (map record)
+                    (sort-by :name))))
