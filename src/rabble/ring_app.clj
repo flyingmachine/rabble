@@ -33,9 +33,3 @@
       wrap-keyword-params
       wrap-nested-params
       wrap-params))
-
-(defn app
-  [& middlewares]
-  (wrap (if (empty? middlewares)
-          rabble-routes
-          ((reduce apply middlewares) rabble-routes))))

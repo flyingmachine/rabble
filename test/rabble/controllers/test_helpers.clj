@@ -4,13 +4,14 @@
             [rabble.db.manage :as db-manage]
             [rabble.ring-app :as ring-app]
             [rabble.middleware.routes :as routes]
-            [clojure.data.json :as json])
+            [clojure.data.json :as json]
+            [compojure.core :as compojure])
   (:use midje.sweet
         flyingmachine.webutils.utils
         rabble.paths
         [ring.mock.request :only [request header content-type]]))
 
-(def app (ring-app/wrap routes/rabble-routes))
+(def app (ring-app/wrap (compojure/routes routes/auth-routes routes/rabble-routes)))
 
 (defn auth
   ([] (auth "flyingmachine"))
