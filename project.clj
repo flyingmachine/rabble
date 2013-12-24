@@ -16,7 +16,7 @@
                  [clj-time "0.6.0"]
                  [compojure "1.1.5"]
                  [liberator "0.10.0"]
-                 [com.cemerick/friend "0.2.0"]
+                 [com.cemerick/friend "0.1.5"]
                  [me.raynes/cegdown "0.1.0"]
                  [ring-middleware-format "0.3.1"]
                  [com.flyingmachine/webutils "0.1.6"]

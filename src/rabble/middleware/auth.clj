@@ -22,10 +22,6 @@
                         dj/ent)]
     (c/mapify user-ent mr/ent->userauth)))
 
-(defn credential-fn
-  [username]
-  (user username))
-
 (defn session-store-authorize [{:keys [uri request-method params session]}]
   (when (nil? (:cemerick.friend/identity session))
     (if-let [username (get-in session [:cemerick.friend/identity :current])]
@@ -35,10 +31,13 @@
   [ring-app]
   (friend/authenticate
    ring-app
-   {:credential-fn (partial creds/bcrypt-credential-fn credential-fn)
+   {:credential-fn (partial creds/bcrypt-credential-fn user)
     :workflows [(workflows/interactive-form
                  :redirect-on-auth? false
-                 :login-failure-handler (fn [req] {:body {:errors {:username ["invalid username or password"]}} :status 401}))
+                 :login-failure-handler
+                 (fn [req]
+                   {:body {:errors {:username ["invalid username or password"]}}
+                    :status 401}))
                 users/attempt-registration
                 session-store-authorize]
     :redirect-on-auth? false
