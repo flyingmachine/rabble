@@ -1,0 +1,146 @@
+[;; session
+ {:db/ident :session/key
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/uuid
+  :db/cardinality :db.cardinality/one
+  :db/unique :db.unique/value
+  :db/index true
+  :db/doc "Key to look up session"
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :session/data
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "All session data"
+  :db.install/_attribute :db.part/db}
+ 
+ ;; users
+ {:db/ident :user/username
+  :db/id #db/id [:db.part/db]
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/fulltext true
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :user/password
+  :db/id #db/id [:db.part/db]
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :user/email
+  :db/id #db/id [:db.part/db]
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/index true
+  :db/fulltext true
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :user/receive-watch-notifications
+  :db/id #db/id [:db.part/db]
+  :db/valueType :db.type/boolean
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :user/about
+  :db/id #db/id [:db.part/db]
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/fulltext true
+  :db.install/_attribute :db.part/db}
+
+ ;; topics
+ {:db/ident :topic/title
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/fulltext true
+  :db/doc "Topic title"
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :topic/first-post
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "Post which initiates topic"
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :topic/last-posted-to-at
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/instant
+  :db/cardinality :db.cardinality/one
+  :db/doc "Time of last post to this topic"
+  :db.install/_attribute :db.part/db}
+
+ ;; watches
+ {:db/ident :watch/user
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "User watching a topic"
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :watch/topic
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ 
+ {:db/ident :watch/unread-count
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one
+  :db/doc "Number of updates the watched topic has received"
+  :db.install/_attribute :db.part/db}
+
+ ;; likes
+  {:db/ident :like/user
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :like/post
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ 
+ ;; posts
+ {:db/ident :post/content
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/fulltext true
+  :db/doc "Post content"
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :post/topic
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "A post's topic"
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :post/created-at
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/instant
+  :db/cardinality :db.cardinality/one
+  :db/doc "When the post was created"
+  :db.install/_attribute :db.part/db}
+ 
+ ;; content
+ {:db/ident :content/author
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "General author attribute"
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :content/deleted
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/boolean
+  :db/cardinality :db.cardinality/one
+  :db/doc "Whether the content is deleted"
+  :db.install/_attribute :db.part/db}]

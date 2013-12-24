@@ -1,0 +1,25 @@
+;; This used to contain actual seed data. The file is misnamed.
+[ ;; update watches
+ ;; TODO choose better names to indicate that user's watch isn't updated
+ {:db/id #db/id [:db.part/user]
+  :db/ident :increment-watch-count
+  :db/fn #db/fn {:lang :clojure
+                 :params [db topic user]
+                 :code (let [watches (datomic.api/q '[:find ?watch
+                                                      :in $ ?topic ?user
+                                                      :where [?watch :watch/topic ?topic]
+                                                      [?watch :watch/user ?watch-user]
+                                                      [(not= ?watch-user ?user)]
+                                                      [?topic :content/deleted false]]
+                                                    db
+                                                    topic
+                                                    user)]
+                         (map
+                          (fn [x]
+                            (let [e (first x)
+                                  watch (datomic.api/entity db e)]
+                              [:db/add
+                               e
+                               :watch/unread-count
+                               (inc (:watch/unread-count watch))]))
+                          watches))}}]
