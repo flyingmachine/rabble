@@ -33,7 +33,7 @@
                          {:template-path "email-templates"
                           :send-email false
                           :from-address "notifications@rabble-forum.com"
-                          :from-name "Grateful Place Notifications"}
+                          :from-name "Forum Notifications"}
                          :datomic {:db-uri "datomic:free://localhost:4334/rabble"
                                    :test-uri "datomic:mem://rabble-test"}
                          :rabble {:moderator-names ["flyingmachine"]}}}
