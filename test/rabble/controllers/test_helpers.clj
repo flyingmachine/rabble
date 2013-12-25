@@ -56,11 +56,10 @@
                         ~@before))
     (around :facts (tdb/with-test-db ?form))))
 
-(defn topic-id
-  []
-  (:db/id (dj/one [:topic/title])))
+(defn content-id
+  ([content-attribute] (content-id content-attribute "flyingmachine"))
+  ([content-attribute author-username]
+     (:db/id (dj/one content-attribute [:content/author (:id (auth author-username))]))))
 
-(defn post-id
-  ([] (post-id "flyingmachine"))
-  ([author-username]
-     (:db/id (dj/one [:post/content] [:content/author (:id (auth author-username))]))))
+(def topic-id (partial content-id :topic/title))
+(def post-id (partial content-id :post/content))
