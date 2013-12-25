@@ -10,6 +10,7 @@
 (def migrations
   [:20130521-161013-schema
    :20130521-161014-seed-data
+   :20130807-183200-tags
    :20131003-111111-user-prefs
    :20131018-000000-password-reset
    :20131021-000000-topic-privacy])
@@ -96,9 +97,7 @@
   [migration-name]
   {:txes [(-> migration-name
               migration-path
-              io/resource
-              slurp
-              read-string)]})
+              read-resource)]})
 
 (defn migrations-map
   [migration-names]
@@ -110,7 +109,6 @@
 
 (defn migrate
   []
-  (create)
   (apply ensure-schemas
          (into [(dj/conn) :gp2/schema (migrations-map migrations)] migrations)))
 
@@ -121,4 +119,5 @@
 (defn reload
   []
   (delete)
+  (create)
   (migrate))

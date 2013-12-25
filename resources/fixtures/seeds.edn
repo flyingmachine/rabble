@@ -10,6 +10,11 @@
   :user/about "I hail from a long line of joebobs"
   :db/id #db/id [:db.part/user -11]}
 
+ {:tag/name "butterbeans"
+  :db/id #db/id [:db.part/user -50]}
+ {:tag/name "cornbread"
+  :db/id #db/id [:db.part/user -51]}
+
  ;; first topic 
  {:topic/title "First topic"
   :topic/first-post #db/id[:db.part/user -30]
@@ -17,7 +22,12 @@
   :topic/visibility :visibility/public
   :content/author #db/id[:db.part/user -10]
   :content/deleted false
-  :db/id #db/id[:db.part/user -20]}
+  :db/id #db/id [:db.part/user -20]}
+ 
+ {:tag/name "butterbeans"
+  :db/id #db/id [:db.part/user -50]}
+ {:tag/name "cornbread"
+  :db/id #db/id [:db.part/user -51]}
 
  {:watch/user #db/id[:db.part/user -10]
   :watch/topic #db/id[:db.part/user -20]

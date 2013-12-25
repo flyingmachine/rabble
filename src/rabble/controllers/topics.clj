@@ -15,40 +15,65 @@
              :refer (defquery defshow defcreate! defdelete!)]))
 
 (def query-mapify-options
-  {:include (merge {:first-post {:only [:content :likers :id]}}
+  {:include (merge {:first-post {:only [:id :likers]
+                                 :include {:author {:only [:display-name]}}}
+                    :tags {}}
                    author-inclusion-options)})
 
-(defmapifier query-record mr/ent->topic query-mapify-options)
+(defmapifier query-record
+  mr/ent->topic
+  query-mapify-options)
 
 (defmapifier record
   mr/ent->topic
   {:include {:posts {:include author-inclusion-options}
+             :tags {}
              :watches {}}})
 
+(defn organize
+  "Topics come in [eid date] pairs"
+  [topics]
+  (map first (reverse-by second topics)))
+
+(def base-query '[:find ?e ?t
+                  :where
+                  [?e :topic/last-posted-to-at ?t]
+                  [?e :content/deleted false]])
+
+(defn all
+  []
+  (organize
+   (d/q base-query (dj/db))))
+
+(defn tagged
+  [tags]
+  (let [tag-conditions (map (fn [tag] ['?e :content/tags tag]) tags)]
+    (organize
+     (d/q (into base-query tag-conditions)
+          (dj/db)))))
+
+(defn mapify
+  [topics]
+  (map query-record topics))
 
 (defn paginate
   [topics params]
-  (let [per-page 15
+  (let [per-page 50
         topic-count (count topics)
         page-count (math/ceil (/ topic-count per-page))
         current-page (or (str->int (:page params)) 1)
         skip (* (dec current-page) per-page)
-        paged-topics (take per-page (drop skip topics))]
-    (conj paged-topics {:page-count page-count :topic-count topic-count})))
-
-(defn visibility
-  [auth]
-  (when-not (logged-in? auth)
-    [:topic/visibility :visibility/public]))
+        paged-topics (mapify (take per-page (drop skip topics)))]
+    (conj paged-topics {:page-count page-count
+                        :topic-count topic-count
+                        :current-page current-page})))
 
 (defquery
   :return (fn [_]
                (paginate
-                (reverse-by :last-posted-to-at
-                            (map query-record
-                                 (dj/all :topic/first-post
-                                         [:content/deleted false]
-                                         (visibility auth))))
+                (if-let [tags (:tags params)]
+                  (tagged (map str->int (clojure.string/split tags #",")))
+                  (all))
                 params)))
 
 (defshow
