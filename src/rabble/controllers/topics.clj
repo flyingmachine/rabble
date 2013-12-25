@@ -15,7 +15,7 @@
              :refer (defquery defshow defcreate! defdelete!)]))
 
 (def query-mapify-options
-  {:include (merge {:first-post {:only [:id :likers]
+  {:include (merge {:first-post {:only [:id :likers :content]
                                  :include {:author {:only [:display-name]}}}
                     :tags {}}
                    author-inclusion-options)})
