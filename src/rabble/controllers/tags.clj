@@ -1,17 +1,17 @@
 (ns rabble.controllers.tags
   (:require [rabble.db.maprules :as mr]
             [flyingmachine.webutils.utils :refer :all]
-            [com.flyingmachine.datomic-junk :as dj])
-  (:use [liberator.core :only [defresource]]
-        rabble.controllers.shared
+            [com.flyingmachine.datomic-junk :as dj]
+            [com.flyingmachine.liberator-templates.sets.json-crud
+             :refer (defquery)])
+  (:use rabble.controllers.shared
         rabble.db.mapification))
 
 (defmapifier record mr/ent->tag)
 
-(defresource query [params]
-  :available-media-types ["application/json"]
-  :handle-ok (fn [_]
-               (->> :tag/name
-                    dj/all
-                    (map record)
-                    (sort-by :name))))
+(defquery [params]
+  :return (fn [_]
+            (->> :tag/name
+                 dj/all
+                 (map record)
+                 (sort-by :name))))
