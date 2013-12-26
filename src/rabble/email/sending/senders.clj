@@ -17,13 +17,13 @@
 
   (send-reply-notification
    [post]
-   :subject (str "[Grateful Place] Re: " (:title topic))
+   :subject (str "[" (config :forum-name) "] Re: " (:title topic))
    :body-data {:content (:content post)
                :formatted-content (md-content post)})
   
   (send-new-topic-notification
    []
-   :subject (str "[Grateful Place] " (:title topic))
+   :subject (str "[" (config :forum-name) "] " (:title topic))
    :body-data {:content (:content (:first-post topic))
                :formatted-content (md-content (:first-post topic))}))
 
@@ -37,9 +37,9 @@
 
   (send-forgot-username
    []
-   :subject (str "Your Grateful Place username"))
+   :subject (str "Your " (config :forum-name) " username"))
 
   (send-password-reset-token
    []
-   :subject (str "Grateful Place password reset")
+   :subject (str (config :forum-name) " password reset")
    :body-data {:token (:user/password-reset-token user)}))

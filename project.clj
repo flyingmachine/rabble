@@ -36,5 +36,6 @@
                           :from-name "Forum Notifications"}
                          :datomic {:db-uri "datomic:free://localhost:4334/rabble"
                                    :test-uri "datomic:mem://rabble-test"}
-                         :rabble {:moderator-names ["flyingmachine"]}}}
+                         :rabble {:moderator-names ["flyingmachine"]
+                                  :forum-name "Rabble"}}}
              :test [:dev]})
