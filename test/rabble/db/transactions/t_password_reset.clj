@@ -1,8 +1,5 @@
 (ns rabble.db.transactions.t-password-reset
-  (:require [rabble.test.db-helpers :as tdb]
-            [rabble.db.maprules :as mr]
-            [rabble.db.mapification :refer :all]
-            [com.flyingmachine.datomic-junk :as dj]
+  (:require [com.flyingmachine.datomic-junk :as dj]
             [rabble.db.transactions.password-reset :as pr]
             [rabble.db.validations :as validations]
             [flyingmachine.cartographer.core :as c]
