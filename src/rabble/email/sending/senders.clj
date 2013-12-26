@@ -32,7 +32,7 @@
 (defsenders
   {:args [users]
    :user-doseq [user users]}
-  {:from (config :from-address)
+  {:from (rabble-config/config :from-address)
    :to (:user/email user)
    :body-data {:username (:user/username user)}}
 
