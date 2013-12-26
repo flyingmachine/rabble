@@ -2,7 +2,7 @@
   (:require [rabble.controllers.topics :as topics])
   (:use midje.sweet
         rabble.paths
-        rabble.controllers.test-helpers))
+        rabble.test.controller-helpers))
 
 (setup-db-background)
 

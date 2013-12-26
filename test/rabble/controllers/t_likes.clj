@@ -1,11 +1,9 @@
 (ns rabble.controllers.t-likes
   (:require [com.flyingmachine.datomic-junk :as dj]
-            [rabble.db.test :as tdb]
-            [rabble.db.manage :as db-manage]
             [rabble.controllers.likes :as likes])
   (:use midje.sweet
         rabble.paths
-        rabble.controllers.test-helpers))
+        rabble.test.controller-helpers))
 
 (setup-db-background)
 

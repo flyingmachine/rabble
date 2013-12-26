@@ -1,7 +1,7 @@
-(ns rabble.controllers.test-helpers
+(ns rabble.test.controller-helpers
   (:require [com.flyingmachine.datomic-junk :as dj]
-            [rabble.db.test :as tdb]
-            [rabble.db.manage :as db-manage]
+            [rabble.test.db-helpers :as tdb]
+            [rabble.db.tasks :as db-tasks]
             [rabble.ring-app :as ring-app]
             [rabble.middleware.routes :as routes]
             [clojure.data.json :as json]
@@ -51,7 +51,7 @@
   [& before]
   `(background
     (before :contents (tdb/with-test-db
-                        (db-manage/reload)
+                        (db-tasks/reload)
                         (dj/t (read-resource "fixtures/seeds.edn"))
                         ~@before))
     (around :facts (tdb/with-test-db ?form))))

@@ -1,5 +1,5 @@
 (ns rabble.db.transactions.t-password-reset
-  (:require [rabble.db.test :as tdb]
+  (:require [rabble.test.db-helpers :as tdb]
             [rabble.db.maprules :as mr]
             [rabble.db.mapification :refer :all]
             [com.flyingmachine.datomic-junk :as dj]
@@ -10,7 +10,7 @@
             [cemerick.friend.credentials :as friend]
             [clj-time.core :as time])
   (:use midje.sweet
-        rabble.controllers.test-helpers))
+        rabble.test.controller-helpers))
 
 (setup-db-background)
 (defn user

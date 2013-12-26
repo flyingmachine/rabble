@@ -1,7 +1,7 @@
 (ns rabble.controllers.credential-recovery.t-forgot-username
   (:require [com.flyingmachine.datomic-junk :as dj])
   (:use midje.sweet
-        rabble.controllers.test-helpers))
+        rabble.test.controller-helpers))
 
 (setup-db-background)
 

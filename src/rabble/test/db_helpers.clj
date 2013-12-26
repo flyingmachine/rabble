@@ -1,7 +1,7 @@
-(ns rabble.db.test
+(ns rabble.test.db-helpers
   (:require [datomic.api :as d]
             [com.flyingmachine.datomic-junk :as dj]
-            [rabble.db.manage :as manage])
+            [rabble.db.tasks :as db-tasks])
   (:use rabble.config)
   (:import java.io.File))
 
@@ -11,7 +11,3 @@
   [& body]
   `(binding [dj/*db-uri* test-db-uri]
      ~@body))
-
-(defn initialize
-  []
-  (doall (manage/reload)))

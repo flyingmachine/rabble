@@ -2,7 +2,7 @@
   (:require [rabble.controllers.users :as users])
   (:use midje.sweet
         rabble.paths
-        rabble.controllers.test-helpers))
+        rabble.test.controller-helpers))
 
 (setup-db-background)
 

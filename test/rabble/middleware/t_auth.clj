@@ -1,8 +1,7 @@
 (ns rabble.middleware.t-auth
   (:use midje.sweet
         ring.mock.request)
-  (:require [rabble.db.test :as tdb]
-            [rabble.controllers.test-helpers :refer :all]
+  (:require [rabble.test.controller-helpers :refer :all]
             [rabble.middleware.auth :as auth]))
 
 (setup-db-background)

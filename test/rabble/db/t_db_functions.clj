@@ -1,10 +1,10 @@
 (ns rabble.db.t-db-functions
-  (:require [rabble.db.test :as tdb]
+  (:require [rabble.test.db-helpers :as tdb]
             [rabble.db.maprules :as mr]
             [flyingmachine.cartographer.core :as c]
             [com.flyingmachine.datomic-junk :as dj])
   (:use midje.sweet
-        rabble.controllers.test-helpers))
+        rabble.test.controller-helpers))
 
 (setup-db-background)
 
