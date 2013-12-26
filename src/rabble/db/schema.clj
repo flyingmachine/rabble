@@ -1,32 +1,8 @@
-(ns rabble.db.manage
-  (:gen-class)
+(ns rabble.db.schema
   (:require [datomic.api :as d]
             [com.flyingmachine.datomic-junk :as dj]
             [clojure.java.io :as io]
-            [flyingmachine.webutils.utils :refer :all])
-  (:use environ.core)
-  (:import java.io.File))
-
-(def migrations
-  [:20130521-161013-schema
-   :20130521-161014-seed-data
-   :20130807-183200-tags
-   :20131003-111111-user-prefs
-   :20131018-000000-password-reset
-   :20131021-000000-topic-privacy])
-
-(defn create
-  []
-  (d/create-database dj/*db-uri*))
-
-(defn delete
-  []
-  (d/delete-database dj/*db-uri*))
-
-(defn recreate
-  []
-  (delete)
-  (create))
+            [flyingmachine.webutils.utils :refer :all]))
 
 ;; Taken from day of datomic:
 ;; https://github.com/Datomic/day-of-datomic/blob/master/src/datomic/samples/schema.clj
@@ -55,7 +31,7 @@
    installed in database."
   [conn schema-attr]
   (when-not (has-attribute? (d/db conn) schema-attr)
-      (d/transact conn [{:db/id #db/id[:db.part/db]
+    (d/transact conn [{:db/id #db/id[:db.part/db]
                        :db/ident schema-attr
                        :db/valueType :db.type/keyword
                        :db/cardinality :db.cardinality/one
@@ -84,40 +60,7 @@
           (doseq [tx txes]
             ;; hrm, could mark the last tx specially
             (d/transact conn (cons {:db/id #db/id [:db.part/tx]
-                                  schema-attr schema-name}
-                                 tx)))
+                                    schema-attr schema-name}
+                                   tx)))
           (throw (ex-info (str "No data provided for schema" schema-name)
                           {:schema/missing schema-name})))))))
-
-(defn migration-path
-  [migration-name]
-  (str "migrations/" (name migration-name) ".edn"))
-
-(defn migration-data
-  [migration-name]
-  {:txes [(-> migration-name
-              migration-path
-              read-resource)]})
-
-(defn migrations-map
-  [migration-names]
-  (reduce (fn [m name]
-
-            (assoc m name (migration-data name)))
-          {}
-          migration-names))
-
-(defn migrate
-  []
-  (apply ensure-schemas
-         (into [(dj/conn) :gp2/schema (migrations-map migrations)] migrations)))
-
-(defn seed
-  []
-  (dj/t (read-resource "fixtures/seeds.edn")))
-
-(defn reload
-  []
-  (delete)
-  (create)
-  (migrate))
