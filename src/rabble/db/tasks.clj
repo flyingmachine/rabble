@@ -62,13 +62,6 @@
                               [:db/add (:db/id schema) schema-attr new-name]))
                           schemas))))
 
-{:20130521-161013-schema :base
- :20130521-161014-seed-data :watch-count-fn
- :20130807-183200-tags :tags
- :20131003-111111-user-prefs :user-prefs
- :20131018-000000-password-reset :password-reset
- :20131021-000000-topic-privacy :topic-privacy}
-
 (defn seed
   []
   (dj/t (read-resource "fixtures/seeds.edn")))
