@@ -57,7 +57,7 @@
             :retriever #(sort-by :post/created-at
                                  (:post/_topic %)))
   (has-many :tags
-            :rules athens.db.maprules/ent->tag
+            :rules rabble.db.maprules/ent->tag
             :retriever #(sort-by :tag/name
                                  (:content/tags %)))
   (has-many :watches
@@ -94,6 +94,7 @@
   (attr :large-gravatar #(gravatar (:user/email %) :size 48 :default :identicon))
   (attr :post-count (ref-count :content/author [:post/content]))
   (attr :topic-count (ref-count :content/author [:topic/title] [:content/deleted false]))
+  (attr :display-name :user/display-name)
   (has-many :topics
             :rules rabble.db.maprules/ent->topic
             :retriever #(com.flyingmachine.datomic-junk/all :topic/title [:content/author (:db/id %)]))
@@ -103,6 +104,7 @@
 
 (defmaprules ent->userauth
   (attr :id :db/id)
+  (attr :display-name :user/display-name)
   (attr :password :user/password)
   (attr :username :user/username)
   (attr :email :user/email))
@@ -116,6 +118,7 @@
 (defmaprules user->txdata
   (attr :db/id (dbid :author-id :user-id))
   (attr :user/username :username)
+  (attr :user/display-name :display-name)
   (attr :user/email :email)
   (attr :user/about :about)
   (attr :user/preferences :preferences)

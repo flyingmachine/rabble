@@ -52,6 +52,10 @@
   (route GET "/users/:id" users/show)
   (authroute PUT "/users/:id" users/update! authfn)
 
+  ;; Login
+  (route POST "/login" session/create!)
+  (friend/logout (ANY "/logout" [] (ring.util.response/redirect "/")))
+
   ;; Stats
   (route GET "/stats" stats/query)
 
@@ -64,7 +68,4 @@
   (route POST "/credential-recovery/forgot-username" forgot-username/create!)
   (route GET "/credential-recovery/forgot-password/:token" forgot-password/show)
   (route PUT "/credential-recovery/forgot-password/:token" forgot-password/update!)
-  (route POST "/credential-recovery/forgot-password" forgot-password/create!)
-  ;; login/logout
-  (route POST "/login" session/create!)
-  (friend/logout (ANY "/logout" [] (ring.util.response/redirect "/"))))
+  (route POST "/credential-recovery/forgot-password" forgot-password/create!))
