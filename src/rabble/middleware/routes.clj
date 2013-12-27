@@ -45,7 +45,8 @@
   (auth-resource-routes likes
                         :only [:create! :delete!]
                         :suffixes [":post-id"])
-
+  (route GET "/tags" tags/query)
+  
   ;; Users
   (authroute POST "/users" users/registration-success-response authfn)
   (route GET "/users/:id" users/show)
