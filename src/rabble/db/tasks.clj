@@ -21,12 +21,12 @@
   (create))
 
 (def rabble-schemas
-  [:20130521-161013-schema
-   :20130521-161014-seed-data
-   :20130807-183200-tags
-   :20131003-111111-user-prefs
-   :20131018-000000-password-reset
-   :20131021-000000-topic-privacy])
+  [:base
+   :watch-count-fn
+   :tags
+   :user-prefs
+   :password-reset
+   :topic-privacy])
 
 (def schema-attr (or (config :schema-attr) :rabble/schema))
 
