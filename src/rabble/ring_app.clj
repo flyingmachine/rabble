@@ -29,7 +29,7 @@
 (defn wrap
   [to-wrap]
   (-> to-wrap
-      auth
+      
       (wrap-session {:cookie-name (or (config :session-name) "rabble-session")
                      :store (db-session-store {})})
       (wrap-restful-format :formats [:json-kw])
