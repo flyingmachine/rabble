@@ -12,8 +12,6 @@
         rabble.models.permissions
         flyingmachine.webutils.utils))
 
-(defmapifier record  mr/ent->post {:include author-inclusion-options})
-
 (defmapifier record
   mr/ent->post
   {:include (merge {:topic {:only [:id :title]}}

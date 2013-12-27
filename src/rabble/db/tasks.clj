@@ -52,7 +52,7 @@
      (install-schemas rabble-schemas))
   ([schemas]
      (apply schema/ensure-schemas
-            (into [(dj/conn) schema-attr (schema-map rabble-schemas)] schemas))))
+            (into [(dj/conn) schema-attr (schema-map schemas)] schemas))))
 
 (defn rename-schemas
   [name-map]
