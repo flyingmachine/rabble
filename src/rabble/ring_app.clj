@@ -8,7 +8,8 @@
         ring.middleware.format
         [rabble.middleware.routes :only (rabble-routes)]
         [rabble.middleware.auth :only (auth)]
-        [rabble.middleware.db-session-store :only (db-session-store)]))
+        [rabble.middleware.db-session-store :only (db-session-store)]
+        [rabble.config :refer (config)]))
 
 
 (defn wrap-exception [f]
@@ -29,7 +30,8 @@
   [to-wrap]
   (-> to-wrap
       auth
-      (wrap-session {:cookie-name "rabble-session" :store (db-session-store {})})
+      (wrap-session {:cookie-name (or (config :session-name) "rabble-session")
+                     :store (db-session-store {})})
       (wrap-restful-format :formats [:json-kw])
       wrap-exception
       wrap-keyword-params

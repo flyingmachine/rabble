@@ -10,6 +10,7 @@
             [rabble.controllers.shared :refer :all]
             [rabble.models.permissions :refer :all]
             [rabble.db.mapification :refer :all]
+            [rabble.config :refer (config)]
             [flyingmachine.webutils.utils :refer :all]
             [com.flyingmachine.liberator-templates.sets.json-crud
              :refer (defquery defshow defcreate! defdelete!)]))
@@ -56,10 +57,11 @@
   [topics]
   (map query-record topics))
 
+(def per-page (or (config :per-page) 50))
+
 (defn paginate
   [topics params]
-  (let [per-page 50
-        topic-count (count topics)
+  (let [topic-count (count topics)
         page-count (math/ceil (/ topic-count per-page))
         current-page (or (str->int (:page params)) 1)
         skip (* (dec current-page) per-page)
