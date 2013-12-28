@@ -41,7 +41,7 @@
   (auth-resource-routes topics :only [:query :show :create! :delete!])
   (auth-resource-routes watches :only [:query :create! :delete!])
   (auth-resource-routes watched-topics :only [:query])
-  (auth-resource-routes posts :only [:create! :update! :delete!])
+  (auth-resource-routes posts :only [:query :create! :update! :delete!])
   (auth-resource-routes likes
                         :only [:create! :delete!]
                         :suffixes [":post-id"])

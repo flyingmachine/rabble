@@ -33,7 +33,7 @@
               (map record
                    (dj/all :post/content))))
 
-(defquery [params]
+(defquery
   :return (fn [_]
             (if (not-empty (:q params))
               (search params)
