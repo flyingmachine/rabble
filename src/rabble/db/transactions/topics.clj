@@ -5,7 +5,8 @@
             [com.flyingmachine.datomic-junk :as dj]
             [rabble.email.sending.senders :as email]
             [flyingmachine.cartographer.core :as c]
-            [flyingmachine.webutils.utils :refer :all]))
+            [flyingmachine.webutils.utils :refer :all]
+            [clojure.string :refer (split trim lower-case)]))
 
 (defmapifier record mr/ent->topic {:include [:first-post]})
 
@@ -42,11 +43,34 @@
   [params]
   (map #(% params) [topic-params->txdata post-params->txdata watch-params->txdata]))
 
+(defn tags
+  [tag-string]
+  (->> (split (or tag-string "") #",")
+       (map trim)
+       (filter not-empty)
+       (reduce (fn [result tag-name]
+                 (merge-with conj result)
+                 (if-let [tag (dj/one [:tag/name tag-name])]
+                   {:tag-ids (:db/id tag)}
+                   (let [tempid (d/tempid :db.part/user)]
+                     {:tag-ids tempid
+                      :new-tags {:tag/name tag-name
+                                 :db/id tempid}})))
+               {:tag-ids []
+                :new-tags []})))
+
+(defn params->tags
+  [params]
+  (let [{:keys [tag-ids new-tags]} (tags (:tags params))]
+    (into [[:db/add (:topic-id params) :content/tags tag-ids]]
+          new-tags)))
+
 (defn create-topic
   [params]
   (let [final-params (add-create-params params)
         result {:result (-> final-params
-                            topic-transaction-data
+                            params->tags
+                            (into (topic-transaction-data final-params))
                             dj/t)
                 :tempid (:topic-id final-params)}]
     (after-create-topic result final-params)
