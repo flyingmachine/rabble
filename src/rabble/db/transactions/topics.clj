@@ -49,13 +49,13 @@
        (map trim)
        (filter not-empty)
        (reduce (fn [result tag-name]
-                 (merge-with conj result)
-                 (if-let [tag (dj/one [:tag/name tag-name])]
-                   {:tag-ids (:db/id tag)}
-                   (let [tempid (d/tempid :db.part/user)]
-                     {:tag-ids tempid
-                      :new-tags {:tag/name tag-name
-                                 :db/id tempid}})))
+                 (merge-with conj result
+                             (if-let [tag (dj/one [:tag/name tag-name])]
+                               {:tag-ids (:db/id tag)}
+                               (let [tempid (d/tempid :db.part/user)]
+                                 {:tag-ids tempid
+                                  :new-tags {:tag/name tag-name
+                                             :db/id tempid}}))))
                {:tag-ids []
                 :new-tags []})))
 
@@ -73,5 +73,6 @@
                             (into (topic-transaction-data final-params))
                             dj/t)
                 :tempid (:topic-id final-params)}]
+    (println (params->tags params))
     (after-create-topic result final-params)
     result))
