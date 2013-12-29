@@ -6,6 +6,9 @@
             [rabble.config :as rabble-config]
             [rabble.lib.html :refer :all]))
 
+(def forum-name (rabble-config/config :forum-name))
+(def url-base (rabble-config/config :url-base))
+
 ;; Topics/posts
 (defsenders
   {:args [users topic]
@@ -14,17 +17,19 @@
    :to (:user/email user)
    :body-data {:topic-title (:title topic)
                :topic-id (:id topic)
-               :username (:user/username user)}}
+               :username (:user/username user)
+               :forum-name forum-name
+               :url-base url-base}}
 
   (send-reply-notification
    [post]
-   :subject (str "[" (rabble-config/config :forum-name) "] Re: " (:title topic))
+   :subject (str "[" forum-name "] Re: " (:title topic))
    :body-data {:content (:content post)
                :formatted-content (md-content post)})
   
   (send-new-topic-notification
    []
-   :subject (str "[" (rabble-config/config :forum-name) "] " (:title topic))
+   :subject (str "[" forum-name "] " (:title topic))
    :body-data {:content (:content (:first-post topic))
                :formatted-content (md-content (:first-post topic))}))
 
@@ -34,13 +39,15 @@
    :user-doseq [user users]}
   {:from (email-config/config :from-address)
    :to (:user/email user)
-   :body-data {:username (:user/username user)}}
+   :body-data {:username (:user/username user)
+               :forum-name forum-name
+               :url-base url-base}}
 
   (send-forgot-username
    []
-   :subject (str "Your " (rabble-config/config :forum-name) " username"))
+   :subject (str "Your " forum-name " username"))
 
   (send-password-reset-token
    []
-   :subject (str (rabble-config/config :forum-name) " password reset")
+   :subject (str forum-name " password reset")
    :body-data {:token (:user/password-reset-token user)}))

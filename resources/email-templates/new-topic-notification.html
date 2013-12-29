@@ -1,9 +1,9 @@
 <p>Hi {{username}},</p>
 
 <p>
-  There's a new topic, "{{topic-title}}", on Grateful Place. You can
+  There's a new topic, "{{topic-title}}", on {{forum-name}}. You can
   reply to it by visiting
-  <a href="http://rabble.com/#/topics/{{topic-id}}">http://rabble.com/#/topics/{{topic-id}}</a>.
+  <a href="{{url-base}}/#/topics/{{topic-id}}">{{url-base}}/#/topics/{{topic-id}}</a>.
   Here's the post:
 </p>
 
@@ -13,15 +13,5 @@
 
 <p>
   You can change your email preferences by going to
-  <a href="http://rabble.com/#/manage-profile/email">http://rabble.com/#/manage-profile/email</a>
-</p>
-
-<p>
-  If you'd like to stop receiving emails but don't want to log in,
-  please email daniel@rabble.com and let me know :)
-</p>
-
-<p>
-  Take care!<br />
-  Daniel Higginbotham, maintainer of Grateful Place
+  <a href="{{url-base}}/#/manage-profile/email">{{url-base}}/#/manage-profile/email</a>
 </p>

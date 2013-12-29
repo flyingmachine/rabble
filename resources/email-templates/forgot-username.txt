@@ -1,6 +1,6 @@
 Hello,
 
-Your username for Grateful Place is:
+Your username for {{forum-name}} is:
 
 {{username}}
 
