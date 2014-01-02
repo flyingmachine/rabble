@@ -6,11 +6,11 @@
         ring.middleware.nested-params
         ring.middleware.session
         ring.middleware.format
-        [rabble.middleware.routes :only (rabble-routes)]
+        [compojure.core :as compojure]
+        [rabble.middleware.routes :only (rabble-routes auth-routes)]
         [rabble.middleware.auth :only (auth)]
         [rabble.middleware.db-session-store :only (db-session-store)]
         [rabble.config :refer (config)]))
-
 
 (defn wrap-exception [f]
   (fn [request]
@@ -29,7 +29,6 @@
 (defn wrap
   [to-wrap]
   (-> to-wrap
-      
       (wrap-session {:cookie-name (or (config :session-name) "rabble-session")
                      :store (db-session-store {})})
       (wrap-restful-format :formats [:json-kw])
@@ -37,3 +36,10 @@
       wrap-keyword-params
       wrap-nested-params
       wrap-params))
+
+(def app (wrap (auth (compojure/routes auth-routes rabble-routes))))
+
+(defn start
+  "Start the jetty server"
+  []
+  (run-jetty #'app {:port (or (config :port) 8080) :join? false}))
