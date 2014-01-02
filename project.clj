@@ -25,7 +25,8 @@
                  [com.flyingmachine/datomic-junk "0.1.3"]
                  [com.flyingmachine/liberator-templates "0.1.1"]]
 
-  :profiles {:dev {:dependencies [[com.datomic/datomic-free "0.9.4360"]
+  :profiles {:dev {:source-paths ["dev"]
+                   :dependencies [[com.datomic/datomic-free "0.9.4360"]
                                   [midje "1.5.0"]
                                   [ring "1.2.1"]
                                   [ring-mock "0.1.4"]]
