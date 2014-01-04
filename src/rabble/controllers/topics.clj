@@ -14,7 +14,7 @@
             [flyingmachine.webutils.utils :refer :all]
             [com.flyingmachine.liberator-templates.sets.json-crud
              :refer (defquery defshow defcreate! defdelete!)])
-  (:import (rabble.middleware.mapifier RabbleMapifier)))
+  (:import [rabble.middleware.mapifier RabbleMapifier]))
 
 (defprotocol TopicsController
   (query-record [mapifier ent])
@@ -48,6 +48,7 @@
                   [?e :topic/last-posted-to-at ?t]
                   [?e :content/deleted false]])
 
+;; TODO refactor to get rid of separate tagged function?
 (defn all
   ([] (all base-query))
   ([query] (organize (d/q query (dj/db)))))
