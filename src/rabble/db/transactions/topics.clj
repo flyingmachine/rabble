@@ -73,6 +73,5 @@
                             (into (topic-transaction-data final-params))
                             dj/t)
                 :tempid (:topic-id final-params)}]
-    (println (params->tags params))
     (after-create-topic result final-params)
     result))

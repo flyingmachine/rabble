@@ -9,6 +9,7 @@
         [compojure.core :as compojure]
         [rabble.middleware.routes :only (rabble-routes auth-routes)]
         [rabble.middleware.auth :only (auth)]
+        [rabble.middleware.mapifier :only (add-rabble-mapifier)]
         [rabble.middleware.db-session-store :only (db-session-store)]
         [rabble.config :refer (config)]))
 
@@ -37,7 +38,7 @@
       wrap-nested-params
       wrap-params))
 
-(def app (wrap (auth (compojure/routes auth-routes rabble-routes))))
+(def app (wrap (auth (add-rabble-mapifier (compojure/routes auth-routes rabble-routes)))))
 
 (defn start
   "Start the jetty server"

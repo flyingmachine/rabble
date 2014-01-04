@@ -2,7 +2,7 @@
   (:require [com.flyingmachine.datomic-junk :as dj]
             [rabble.test.db-helpers :as tdb]
             [rabble.db.tasks :as db-tasks]
-            [rabble.ring-app :as ring-app]
+            [rabble.ring-app :refer (app)]
             [rabble.middleware.routes :as routes]
             [clojure.data.json :as json]
             [compojure.core :as compojure])
@@ -10,8 +10,6 @@
         flyingmachine.webutils.utils
         rabble.paths
         [ring.mock.request :only [request header content-type]]))
-
-(def app (ring-app/wrap (compojure/routes routes/auth-routes routes/rabble-routes)))
 
 (defn auth
   ([] (auth "flyingmachine"))

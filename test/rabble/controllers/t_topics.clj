@@ -8,7 +8,7 @@
 
 (facts "query returns topics and pagination info"
   (let [data (response-data :get "/topics" {})]
-    (first data) => {"page-count" 1 "topic-count" 2 "current-page" 1}
+    (first data) => {"page-count" 1 "ent-count" 2 "current-page" 1}
     data => (three-of map?)))
 
 (fact "creating a topic with a valid user results in success"
