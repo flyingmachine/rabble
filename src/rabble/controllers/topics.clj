@@ -48,15 +48,23 @@
                   [?e :topic/last-posted-to-at ?t]
                   [?e :content/deleted false]])
 
-;; TODO refactor to get rid of separate tagged function?
-(defn all
-  ([] (all base-query))
-  ([query] (organize (d/q query (dj/db)))))
-
-(defn tagged
+(defn tag-ids
   [tags]
-  (let [tag-conditions (map (fn [tag] ['?e :content/tags tag]) tags)]
-    (all (into base-query tag-conditions))))
+  (map str->int (clojure.string/split tags #",")))
+
+(defn tag-conditions
+  [tag-ids]
+  (map (fn [id] ['?e :content/tags id]) tag-ids))
+
+(defn build-query
+  [params]
+  (if-let [tags (:tags params)]
+    (into base-query (-> tags tag-ids tag-conditions))
+    base-query))
+
+(defn all
+  [params]
+  (organize (d/q (build-query params) (dj/db))))
 
 (defn mapify-rest
   [mapifier topics]
@@ -69,12 +77,7 @@
   :return (fn [ctx]
             (mapify-rest
              (mapifier ctx)
-             (paginate
-              (if-let [tags (:tags params)]
-                (tagged (map str->int (clojure.string/split tags #",")))
-                (all))
-              per-page
-              params))))
+             (paginate (all params) per-page params))))
 
 (defshow
   :exists? (exists? record)
