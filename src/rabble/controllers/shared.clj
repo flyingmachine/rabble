@@ -18,15 +18,15 @@
   []
   '(str->int (:id params)))
 
-(defmacro validator
-  "Used in invalid? which is why truth values are reversed"
+(defn validator
   [params validation]
-  `(fn [ctx#]
-     (if-valid
-      ~params ~validation errors#
-      false
-      [true {:errors errors#
-             :representation {:media-type "application/json"}}])))
+  "Used in invalid? which is why truth values are reversed"
+  (fn [ctx]
+    (if-valid
+     params validation errors
+     false
+     [true {:errors errors
+            :representation {:media-type "application/json"}}])))
 
 ;; working with liberator
 (defn record-in-ctx
@@ -60,12 +60,9 @@
     (if-let [r (mapification-fn (mapifier ctx) (ctx-id ctx))]
       {:record r})))
 
-;; TODO macro to create anonymous function with ctx stuff?
-
-;; TODO something like slice
 (defn errors-in-ctx
   [ctx]
-  {:errors (get ctx :errors)})
+  (select-keys ctx [:errors]))
 
 (defn delete-record-in-ctx
   [ctx]

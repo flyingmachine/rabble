@@ -9,6 +9,7 @@
             [com.flyingmachine.liberator-templates.sets.json-crud
              :refer (defshow defupdate!)]
             cemerick.friend.workflows)
+  (:import [rabble.middleware.mapifier RabbleMapifier])
   (:use [flyingmachine.webutils.validation :only (if-valid)]
         [liberator.core :only [defresource]]
         rabble.models.permissions
@@ -16,18 +17,29 @@
         rabble.controllers.shared
         flyingmachine.webutils.utils))
 
-(defmapifier record mr/ent->user)
-(defmapifier authrecord mr/ent->userauth)
+(defprotocol UsersController
+  (record [mapifier ent] [mapifier ent opts])
+  (authrecord [mapifier ent]))
+
+(defmapifier record* mr/ent->user)
+(defmapifier authrecord* mr/ent->userauth)
+
+(extend-type RabbleMapifier
+  UsersController
+  (record
+    ([mapifier ent] (record* ent))
+    ([mapifier ent opts] (record* ent opts)))
+  (authrecord [mapifier ent] (authrecord* ent)))
 
 (defn attempt-registration
   [req]
-  (let [{:keys [uri request-method params session]} req]
+  (let [{:keys [uri request-method params session rabble]} req]
     (when (and (= uri "/users")
                (= request-method :post))
       (if-valid
        params (:create validations/user) errors
        (cemerick.friend.workflows/make-auth
-        (mapify-tx-result (tx/create-user params) record)
+        (mapify-tx-result (tx/create-user params) (partial record (:mapifier rabble)))
         {:cemerick.friend/redirect-on-auth? false})
        (invalid errors)))))
 
@@ -46,7 +58,7 @@
 
 (defshow
   [params]
-  :exists? (exists? (record (id) (show-opts params)))
+  :exists? (exists? (fn [m id] (record m id (show-opts params))))
   :return record-in-ctx)
 
 (defn update!*
@@ -62,19 +74,25 @@
   :authorized? (current-user-id? (id) auth)
   :exists? (fn [_] (dj/ent (id)))
   :put! (fn [_] (update!* params))
-  :return (fn [_] (record (id))))
+  :return (mapify-with record))
 
+
+;; TODO update with exists?
 (defn- password-params
-  [params]
-  (let [user (authrecord (id))]
+  [mapifier params]
+  (let [user (authrecord mapifier (id))]
     {:new-password (select-keys params [:new-password :new-password-confirmation])
-     :current-password (merge (select-keys params [:current-password]) {:password (:password user)})}))
+     :current-password (merge (select-keys params [:current-password])
+                              (select-keys user [:password]))}))
 
 (defresource change-password! [params auth]
   :allowed-methods [:put :post]
   :available-media-types ["application/json"]
 
-  :malformed? (validator (password-params params) validations/change-password)
+  :malformed? (fn [ctx]
+                ((validator (password-params (mapifier ctx) params)
+                             validations/change-password)
+                 ctx))
   :handle-malformed errors-in-ctx
   
   :authorized? (fn [_] (current-user-id? (id) auth))
