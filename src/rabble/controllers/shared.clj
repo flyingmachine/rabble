@@ -82,10 +82,10 @@
          {:record record#}))))
 
 (defmacro can-update-record?
-  [record auth]
-  `(fn [_#]
-     (let [auth# ~auth
-           record# ~record]
+  [mapification-fn auth]
+  `(fn [ctx#]
+     (let [record# (~mapification-fn (mapifier ctx#) (ctx-id ctx#))
+           auth# ~auth]
        (if (and (not (:deleted record#))
                 (or (moderator? auth#)
                     (author? record# auth#)))
@@ -105,3 +105,8 @@
 (defn create-content
   [creation-fn params auth mapification-fn]
   (create-record creation-fn (merge params {:author-id (:id auth)}) mapification-fn))
+
+(defn mapify-with
+  [mapify-fn]
+  (fn [ctx]
+    (mapify-fn (mapifier ctx) (ctx-id ctx))))

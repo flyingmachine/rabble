@@ -8,18 +8,26 @@
             [com.flyingmachine.datomic-junk :as dj]
             [com.flyingmachine.liberator-templates.sets.json-crud
              :refer (defquery defupdate! defcreate! defdelete!)])
+  (:import [rabble.middleware.mapifier RabbleMapifier])
   (:use rabble.controllers.shared
         rabble.models.permissions
         flyingmachine.webutils.utils))
 
-(defmapifier record
+(defprotocol PostsController
+  (record [mapifier ent]))
+
+(defmapifier record*
   mr/ent->post
   {:include (merge {:topic {:only [:id :title]}}
                    author-inclusion-options)})
 
+(extend-type RabbleMapifier
+  PostsController
+  (record [mapifier ent] (record* ent)))
+
 (defn search
-  [params]
-  (map (comp record first)
+  [mapifier params]
+  (map (comp (partial record mapifier) first)
        (d/q '[:find ?post
               :in $ ?search
               :where
@@ -28,22 +36,21 @@
             (:q params))))
 
 (defn all
-  []
-  (reverse-by :created-at
-              (map record
-                   (dj/all :post/content))))
+  [mapifier]
+  (reverse-by :created-at (map (partial record mapifier) (dj/all :post/content))))
 
 (defquery
-  :return (fn [_]
-            (if (not-empty (:q params))
-              (search params)
-              (all))))
+  :return (fn [ctx]
+            (let [m (mapifier ctx)]
+              (if (not-empty (:q params))
+                (search m params)
+                (all m)))))
 
 (defupdate!
   :invalid? (validator params (:update validations/post))
-  :authorized? (can-update-record? (record (id)) auth)
+  :authorized? (can-update-record? record auth)
   :put! (update-record params tx/update-post)
-  :return (fn [_] (record (id))))
+  :return (mapify-with record))
 
 (defcreate!
   :invalid? (validator params (:create validations/post))
@@ -52,5 +59,5 @@
   :return record-in-ctx)
 
 (defdelete!
-  :authorized? (can-delete-record? (record (id)) auth)
+  :authorized? (can-delete-record? record auth)
   :delete! delete-record-in-ctx)
