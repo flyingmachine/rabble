@@ -47,12 +47,10 @@
           {}
           schema-names))
 
-(defn install-schemas
-  ([]
-     (install-schemas rabble-schemas))
-  ([schemas]
-     (apply schema/ensure-schemas
-            (into [(dj/conn) schema-attr (schema-map schemas)] schemas))))
+(defnpd install-schemas
+  [[schemas rabble-schemas]]
+  (apply schema/ensure-schemas
+         (into [(dj/conn) schema-attr (schema-map schemas)] schemas)))
 
 (defn rename-schemas
   [name-map]
@@ -66,7 +64,7 @@
   []
   (dj/t (read-resource "fixtures/seeds.edn")))
 
-(defn reload
-  []
+(defnpd reload
+  [[schemas rabble-schemas]]
   (recreate)
-  (install-schemas))
+  (install-schemas schemas))
