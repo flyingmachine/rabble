@@ -54,11 +54,14 @@
   [ctx]
   (str->int (get-in ctx [:request :params :id])))
 
+(defn add-record-to-ctx
+  [r]
+  (if r {:record r}))
+
 (defn exists?
   [mapification-fn]
   (fn [ctx]
-    (if-let [r (mapification-fn (mapifier ctx) (ctx-id ctx))]
-      {:record r})))
+    (add-record-to-ctx (mapification-fn (mapifier ctx) (ctx-id ctx)))))
 
 (defn errors-in-ctx
   [ctx]

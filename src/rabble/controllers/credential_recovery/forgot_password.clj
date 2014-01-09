@@ -18,8 +18,7 @@
   :invalid? (validator params validations/forgot-password)
   
   :exists? (fn [_]
-             (if-let [user (first (dj/all [:user/username (:username params)]))]
-               {:record user}))
+             (add-record-to-ctx (first (dj/all [:user/username (:username params)]))))
   :can-post-to-missing? false
   :handle-not-found (fn [_] {:errors {:username ["That username isn't in our system"]}})
 

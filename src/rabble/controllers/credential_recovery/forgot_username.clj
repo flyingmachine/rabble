@@ -10,7 +10,7 @@
 (defcreate!
   [params]
   :invalid? (validator params validations/forgot-username)
-  :exists? (fn [_] (exists? (seq (dj/all [:user/email (:email params)]))))
+  :exists? (fn [_] (add-record-to-ctx (first (dj/all [:user/email (:email params)]))))
   :can-post-to-missing? false
   :handle-not-found (fn [_] {:errors {:email ["That email address doesn't exist"]}})
   :post! (fn [ctx] (future (email/send-forgot-username (:record ctx))))
