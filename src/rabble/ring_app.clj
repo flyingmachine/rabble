@@ -11,7 +11,8 @@
         [rabble.middleware.auth :only (auth)]
         [rabble.middleware.mapifier :only (add-rabble-mapifier)]
         [rabble.middleware.db-session-store :only (db-session-store)]
-        [rabble.config :refer (config)]))
+        [rabble.config :refer (config)]
+        [flyingmachine.webutils.utils :only (defnpd)]))
 
 (defn wrap-exception [f]
   (fn [request]
@@ -38,7 +39,13 @@
       wrap-nested-params
       wrap-params))
 
-(def app (wrap (auth (add-rabble-mapifier (compojure/routes auth-routes rabble-routes)))))
+(defnpd site
+  [[middlewares []] [routes []]]
+  (let [router (apply compojure/routes (conj (vec routes) rabble-routes))
+        stack (into [router] (conj (vec (reverse middlewares)) wrap))]
+    (reduce #(%2 %1) stack)))
+
+(def app (site [auth add-rabble-mapifier] [auth-routes]))
 
 (defn start
   "Start the jetty server"
