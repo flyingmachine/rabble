@@ -17,12 +17,14 @@
   [params]
   :invalid? (validator params validations/forgot-password)
   
-  :exists? (fn [_] (exists? (seq (dj/all [:user/username (:username params)]))))
+  :exists? (fn [_]
+             (if-let [user (first (dj/all [:user/username (:username params)]))]
+               {:record user}))
   :can-post-to-missing? false
   :handle-not-found (fn [_] {:errors {:username ["That username isn't in our system"]}})
 
   :post! (fn [ctx]
-           (let [[user] (:record ctx)]
+           (let [user (:record ctx)]
              (future
                (tx/create-token user)
                (email/send-password-reset-token [(dj/ent (:db/id user))])))
