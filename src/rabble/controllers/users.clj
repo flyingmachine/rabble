@@ -63,8 +63,9 @@
 
 (defn update!*
   [params]
-  (dj/t [[:db/retract (str->int (:id params)) :user/preferences tx/preferences] ; remove all existing prefs
-         (remove-nils-from-map
+  ; remove all existing prefs
+  (dj/t [[:db/retract (str->int (:id params)) :user/preferences tx/preferences]])
+  (dj/t [(remove-nils-from-map
           (c/mapify params
                     mr/user->txdata
                     {:exclude [:user/username :user/password]}))]))
