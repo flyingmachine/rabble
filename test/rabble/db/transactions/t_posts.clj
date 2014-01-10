@@ -42,12 +42,3 @@
                     :content "new content"})
     (:post/content (dj/ent post-id))
     => "new content"))
-
-(fact "users-to-notify-of-post returns a correct seq of users"
-  (let [topic-id (:db/id (topic))
-        user-id (:id (auth "joebob"))
-        author-id (:id (auth))]
-    (w/create-watch {:topic-id topic-id
-                     :user-id user-id})
-    (p/users-to-notify-of-post topic-id author-id)
-    => []))

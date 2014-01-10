@@ -10,6 +10,7 @@
             [rabble.models.permissions :refer :all]
             [rabble.db.mapification :refer :all]
             [rabble.middleware.mapifier :refer :all]
+            [rabble.email.sending.notifications :as n]
             [rabble.config :refer (config)]
             [flyingmachine.webutils.utils :refer :all]
             [com.flyingmachine.liberator-templates.sets.json-crud
@@ -88,7 +89,10 @@
 (defcreate!
   :authorized? (logged-in? auth)
   :invalid? (validator params validations/topic)
-  :post! (create-content topic-tx/create-topic params auth query-record)
+  :post! (create-content
+          topic-tx/create-topic params auth query-record
+          (fn [ctx params topic]
+            (future (n/notify-users-of-topic (mapifier ctx) topic params))))
   :return record-in-ctx)
 
 (defdelete!

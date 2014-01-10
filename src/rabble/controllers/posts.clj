@@ -4,6 +4,7 @@
             [rabble.db.transactions.posts :as tx]
             [rabble.db.maprules :as mr]
             [rabble.db.mapification :refer :all]
+            [rabble.email.sending.notifications :as n]
             [flyingmachine.cartographer.core :as c]
             [com.flyingmachine.datomic-junk :as dj]
             [com.flyingmachine.liberator-templates.sets.json-crud
@@ -55,7 +56,10 @@
 (defcreate!
   :invalid? (validator params (:create validations/post))
   :authorized? (logged-in? auth)
-  :post! (create-content tx/create-post params auth record)
+  :post! (create-content
+          tx/create-post params auth record
+          (fn [ctx params _]
+            (future (n/notify-users-of-post (mapifier ctx) params))))
   :return record-in-ctx)
 
 (defdelete!

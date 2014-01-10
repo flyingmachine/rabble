@@ -4,7 +4,6 @@
             [rabble.db.mapification :refer :all]
             [com.flyingmachine.datomic-junk :as dj]
             [rabble.email.sending.senders :as email]
-            [flyingmachine.cartographer.core :as c]
             [flyingmachine.webutils.utils :refer :all]
             [clojure.string :refer (split trim lower-case)]))
 
@@ -14,24 +13,6 @@
 (defmapifier watch-params->txdata mr/watch->txdata)
 (defmapifier user mr/ent->user {:only [:email :username :display-name]})
 (defmapifier post-params->txdata mr/post->txdata)
-
-;: TODO refactor with post notification query
-(defn users-to-notify-of-topic
-  [author-id]
-  (dj/ents (dj/q (conj '[:find ?u :where]
-                       '[?u :user/preferences "receive-new-topic-notifications"]
-                       [(list 'not= '?u author-id)]))))
-
-(defn- notify-users-of-topic
-  [result params]
-  (let [{:keys [topic-id author-id]} params
-        users (users-to-notify-of-topic author-id)
-        topic (mapify-tx-result result record)]
-    (email/send-new-topic-notification users topic (user author-id))))
-
-(defn- after-create-topic
-  [result params]
-  (future (notify-users-of-topic result params)))
 
 (defn- add-create-params
   [params]
@@ -71,5 +52,4 @@
                             (into (topic-transaction-data final-params))
                             dj/t)
                 :tempid (:topic-id final-params)}]
-    (after-create-topic result final-params)
     result))

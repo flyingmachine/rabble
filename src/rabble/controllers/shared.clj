@@ -96,15 +96,17 @@
   (fn [_]
     (update-fn params)))
 
-(defn create-record
-  [creation-fn params mapification-fn]
+(defnpd create-record
+  [creation-fn params mapification-fn [after-create nil]]
   (fn [ctx]
-    (let [result (creation-fn params)]
-      {:record (mapify-tx-result result (partial mapification-fn (mapifier ctx)))})))
+    (let [result (creation-fn params)
+          record (mapify-tx-result result (partial mapification-fn (mapifier ctx)))]
+      (if after-create (after-create ctx params record))
+      {:record record})))
 
-(defn create-content
-  [creation-fn params auth mapification-fn]
-  (create-record creation-fn (merge params {:author-id (:id auth)}) mapification-fn))
+(defnpd create-content
+  [creation-fn params auth mapification-fn [after-create nil]]
+  (create-record creation-fn (merge params {:author-id (:id auth)}) mapification-fn after-create))
 
 (defn mapify-with
   [mapify-fn]

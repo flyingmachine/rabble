@@ -9,27 +9,6 @@
 (defmapifier post-params->txdata* mr/post->txdata)
 (def post-params->txdata (comp remove-nils-from-map post-params->txdata*))
 (defmapifier watch-params->txdata mr/watch->txdata)
-(defmapifier user mr/ent->user {:only [:email :username :display-name]})
-
-(defn users-to-notify-of-post
-  [topic-id author-id]
-  (dj/ents (dj/q {:find '[?u]
-                  :where [['?w :watch/topic topic-id]
-                          ['?w :watch/user '?u]
-                          ['?u :user/preferences "receive-watch-notifications"]
-                          [(list 'not= '?u author-id)]]})))
-
-(defn- notify-users-of-post
-  [result params]
-  (let [{:keys [topic-id author-id]} params
-        users (users-to-notify-of-post topic-id author-id)
-        
-        topic (c/mapify (dj/ent topic-id) mr/ent->topic)]
-    (email/send-reply-notification users topic (user author-id) params)))
-
-(defn- after-create-post
-  [result params]
-  (future (notify-users-of-post result params)))
 
 (defn- add-create-params
   [params]
@@ -46,7 +25,6 @@
                                (watch-params->txdata final-params)
                                [:increment-watch-count topic-id author-id]])
                 :tempid (:db/id post)}]
-    (after-create-post result final-params)
     result))
 
 (defn update-post
