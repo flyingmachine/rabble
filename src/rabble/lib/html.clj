@@ -1,11 +1,11 @@
 (ns rabble.lib.html
-  (:require [markdown.core :as markdown]
+  (:require [me.raynes.cegdown :as md]
             [flyingmachine.webutils.utils :refer :all]))
 
 (defn md-content
   [content]
   (let [content (or (:content content) content)]
-    (markdown/md-to-html-string (xml-str content))))
+    (md/to-html (xml-str content) [:fenced-code-blocks])))
 
 (defn mask-deleted
   [content-fn]
