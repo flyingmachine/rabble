@@ -13,8 +13,8 @@
 (defsenders
   {:args [users topic author]
    :user-doseq [user users]}
-  {:from-address (email-config/config :from-address)
-   :from-name (email-config/config :from-name)
+  {:from-address (email-config/config author :from-address)
+   :from-name (email-config/config author :from-name)
    :to (:user/email user)
    :body-data {:topic-title (:title topic)
                :topic-id (:id topic)
