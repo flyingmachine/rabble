@@ -14,6 +14,7 @@
   {:args [users topic author]
    :user-doseq [user users]}
   {:from-address (email-config/config :from-address)
+   :from-name (email-config/config :from-name)
    :to (:user/email user)
    :body-data {:topic-title (:title topic)
                :topic-id (:id topic)
@@ -39,6 +40,7 @@
   {:args [users]
    :user-doseq [user users]}
   {:from-address (email-config/config :from-address)
+   :from-name (email-config/config :from-name)
    :to (:user/email user)
    :body-data {:username (:user/username user)
                :forum-name forum-name
