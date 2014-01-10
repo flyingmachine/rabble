@@ -11,12 +11,13 @@
 
 ;; Topics/posts
 (defsenders
-  {:args [users topic]
+  {:args [users topic author]
    :user-doseq [user users]}
-  {:from (email-config/config :from-address)
+  {:from-address (email-config/config :from-address)
    :to (:user/email user)
    :body-data {:topic-title (:title topic)
                :topic-id (:id topic)
+               :author author
                :username (:user/username user)
                :forum-name forum-name
                :url-base url-base}}
@@ -37,7 +38,7 @@
 (defsenders
   {:args [users]
    :user-doseq [user users]}
-  {:from (email-config/config :from-address)
+  {:from-address (email-config/config :from-address)
    :to (:user/email user)
    :body-data {:username (:user/username user)
                :forum-name forum-name

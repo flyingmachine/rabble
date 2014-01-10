@@ -1,6 +1,6 @@
 Hi {{username}},
 
-There's a new topic, "{{topic-title}}", on {{forum-name}}. You can reply to it by visiting {{url-base}}/#/topics/{{topic-id}}. Here's the post:
+There's a new topic, "{{topic-title}}", by {{author.username}} on {{forum-name}}. You can reply to it by visiting {{url-base}}/#/topics/{{topic-id}}. Here's the post:
 
 =========
 

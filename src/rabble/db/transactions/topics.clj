@@ -9,12 +9,10 @@
             [clojure.string :refer (split trim lower-case)]))
 
 (defmapifier record mr/ent->topic {:include [:first-post]})
-
 (defmapifier topic-params->txdata* mr/topic->txdata)
 (def topic-params->txdata (comp remove-nils-from-map topic-params->txdata*))
-
 (defmapifier watch-params->txdata mr/watch->txdata)
-
+(defmapifier user mr/ent->user {:only [:email :username :display-name]})
 (defmapifier post-params->txdata mr/post->txdata)
 
 ;: TODO refactor with post notification query
@@ -29,7 +27,7 @@
   (let [{:keys [topic-id author-id]} params
         users (users-to-notify-of-topic author-id)
         topic (mapify-tx-result result record)]
-    (email/send-new-topic-notification users topic)))
+    (email/send-new-topic-notification users topic (user author-id))))
 
 (defn- after-create-topic
   [result params]

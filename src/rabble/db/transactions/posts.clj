@@ -8,8 +8,8 @@
 
 (defmapifier post-params->txdata* mr/post->txdata)
 (def post-params->txdata (comp remove-nils-from-map post-params->txdata*))
-
 (defmapifier watch-params->txdata mr/watch->txdata)
+(defmapifier user mr/ent->user {:only [:email :username :display-name]})
 
 (defn users-to-notify-of-post
   [topic-id author-id]
@@ -23,8 +23,9 @@
   [result params]
   (let [{:keys [topic-id author-id]} params
         users (users-to-notify-of-post topic-id author-id)
+        
         topic (c/mapify (dj/ent topic-id) mr/ent->topic)]
-    (email/send-reply-notification users topic params)))
+    (email/send-reply-notification users topic (user author-id) params)))
 
 (defn- after-create-post
   [result params]
