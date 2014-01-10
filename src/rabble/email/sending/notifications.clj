@@ -29,7 +29,6 @@
 
 (defn- notify-users-of-topic*
   [topic params]
-  (println "NOTIFYING OF TOPIC" users topic)
   (let [{:keys [author-id]} params
         users (users-to-notify-of-topic author-id)]
     (email/send-new-topic-notification users topic (author author-id))))
