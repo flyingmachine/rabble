@@ -1,6 +1,7 @@
 (ns rabble.controllers.js
   (:require [cemerick.friend :as friend]
-            [rabble.config :refer (config)]))
+            [rabble.config :refer (config)]
+            [clojure.data.json :as json]))
 
 (defn load-session
   [params auth]
@@ -11,5 +12,5 @@
                       "').value('loadedSession', " value ")")
            :headers {"content-type" "application/javascript"}})]
     (if auth
-      (session-js (str "{username:'" (:username auth) "', id: " (:id auth) "}"))
+      (session-js (json/write-str (select-keys auth [:username :id :display-name])))
       (session-js "null"))))

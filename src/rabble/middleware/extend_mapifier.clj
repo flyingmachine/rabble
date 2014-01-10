@@ -1,5 +1,6 @@
 (ns rabble.middleware.extend-mapifier
   (:require [rabble.controllers.topics :refer (TopicsController)]
+            [rabble.controllers.watched-topics :refer (WatchedTopicsController)]
             [rabble.controllers.posts :refer (PostsController)]
             [rabble.controllers.users :refer (UsersController)]
             [rabble.email.sending.notifications :refer (Notifications)])
