@@ -27,7 +27,7 @@
   [author-id]
   (users author-id "receive-new-topic-notifications"))
 
-(defn- notify-users-of-topic*
+(defn notify-users-of-topic*
   [topic params]
   (let [{:keys [author-id]} params
         users (users-to-notify-of-topic author-id)]
@@ -40,7 +40,7 @@
          [['?w :watch/topic topic-id]
           ['?w :watch/user '?u]]))
 
-(defn- notify-users-of-post*
+(defn notify-users-of-post*
   [params]
   (let [{:keys [topic-id author-id]} params
         users (users-to-notify-of-post topic-id author-id)
