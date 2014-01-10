@@ -35,7 +35,7 @@
    :body-data {:content (:content (:first-post topic))
                :formatted-content (md-content (:first-post topic))}))
 
-
+;; Credentials
 (defsenders
   {:args [users]
    :user-doseq [user users]}
