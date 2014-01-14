@@ -72,13 +72,11 @@
   (conj (map (partial query-record mapifier) (rest topics))
         (first topics)))
 
-(def per-page (or (config :per-page) 50))
-
 (defquery
   :return (fn [ctx]
             (mapify-rest
              (mapifier ctx)
-             (paginate (all params) per-page params))))
+             (paginate (all params) (or (config :per-page) 50) params))))
 
 (defshow
   :exists? (exists? record)

@@ -38,5 +38,6 @@
                          :datomic {:db-uri "datomic:free://localhost:4334/rabble"
                                    :test-uri "datomic:mem://rabble-test"}
                          :rabble {:moderator-names ["flyingmachine"]
-                                  :forum-name "Rabble"}}}
+                                  :forum-name "Rabble"
+                                  :per-page 50}}}
              :test [:dev]})
