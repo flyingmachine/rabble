@@ -43,7 +43,7 @@
 
 (defn query-ents
   [params]
-  (if (empty (:q params))
+  (if (empty? (:q params))
     (all)
     (search params)))
 
