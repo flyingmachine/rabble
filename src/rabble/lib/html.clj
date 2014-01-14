@@ -5,7 +5,7 @@
 (defn md-content
   [content]
   (let [content (or (:content content) content)]
-    (md/to-html (xml-str content) [:fenced-code-blocks])))
+    (md/to-html (xml-str content) [:fenced-code-blocks :autolinks])))
 
 (defn mask-deleted
   [content-fn]
