@@ -44,8 +44,8 @@
 (defn query-ents
   [params]
   (if (empty (:q params))
-    (search params)
-    (all)))
+    (all)
+    (search params)))
 
 (defquery
   :return (fn [ctx]
