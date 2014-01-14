@@ -67,15 +67,11 @@
   [params]
   (organize (d/q (build-query params) (dj/db))))
 
-(defn mapify-rest
-  [mapifier topics]
-  (conj (map (partial query-record mapifier) (rest topics))
-        (first topics)))
-
 (defquery
   :return (fn [ctx]
             (mapify-rest
              (mapifier ctx)
+             query-record
              (paginate (all params) (or (config :per-page) 50) params))))
 
 (defshow

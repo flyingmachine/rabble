@@ -4,6 +4,7 @@
             [rabble.db.transactions.posts :as tx]
             [rabble.db.maprules :as mr]
             [rabble.db.mapification :refer :all]
+            [rabble.config :refer (config)]
             [rabble.email.sending.notifications :as n]
             [flyingmachine.cartographer.core :as c]
             [com.flyingmachine.datomic-junk :as dj]
@@ -27,8 +28,8 @@
   (record [mapifier ent] (record* ent)))
 
 (defn search
-  [mapifier params]
-  (map (comp (partial record mapifier) first)
+  [params]
+  (map first
        (d/q '[:find ?post
               :in $ ?search
               :where
@@ -37,15 +38,21 @@
             (:q params))))
 
 (defn all
-  [mapifier]
-  (reverse-by :created-at (map (partial record mapifier) (dj/all :post/content))))
+  []
+  (reverse-by :post/created-at (dj/all :post/content)))
+
+(defn query-ents
+  [params]
+  (if (empty (:q params))
+    (search params)
+    (all)))
 
 (defquery
   :return (fn [ctx]
-            (let [m (mapifier ctx)]
-              (if (not-empty (:q params))
-                (search m params)
-                (all m)))))
+            (mapify-rest
+             (mapifier ctx)
+             record
+             (paginate (query-ents params) (or (config :per-page) 50) params))))
 
 (defupdate!
   :invalid? (validator params (:update validations/post))

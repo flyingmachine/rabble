@@ -35,6 +35,11 @@
 
 (def exists-in-ctx? record-in-ctx)
 
+(defn mapify-rest
+  [mapifier map-fn ents]
+  (conj (map (partial map-fn mapifier) (rest ents))
+        (first ents)))
+
 (defn paginate
   [ents per-page params]
   (let [ent-count (count ents)
