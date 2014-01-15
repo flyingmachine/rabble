@@ -4,16 +4,16 @@
             [rabble.db.transactions.posts :as tx]
             [rabble.db.maprules :as mr]
             [rabble.db.mapification :refer :all]
+            [rabble.controllers.shared :refer :all]
+            [rabble.models.permissions :refer :all]
             [rabble.config :refer (config)]
             [rabble.email.sending.notifications :as n]
             [flyingmachine.cartographer.core :as c]
             [com.flyingmachine.datomic-junk :as dj]
+            [flyingmachine.webutils.utils :refer :all]
             [com.flyingmachine.liberator-templates.sets.json-crud
              :refer (defquery defupdate! defcreate! defdelete!)])
-  (:import [rabble.middleware.mapifier RabbleMapifier])
-  (:use rabble.controllers.shared
-        rabble.models.permissions
-        flyingmachine.webutils.utils))
+  (:import [rabble.middleware.mapifier RabbleMapifier]))
 
 (defprotocol PostsController
   (record [mapifier ent]))
