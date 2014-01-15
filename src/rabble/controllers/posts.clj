@@ -13,19 +13,19 @@
             [flyingmachine.webutils.utils :refer :all]
             [com.flyingmachine.liberator-templates.sets.json-crud
              :refer (defquery defupdate! defcreate! defdelete!)])
-  (:import [rabble.middleware.mapifier RabbleMapifier]))
+  (:import [rabble.lib.dispatcher RabbleDispatcher]))
 
 (defprotocol PostsController
-  (record [mapifier ent]))
+  (record [dispatcher ent]))
 
 (defmapifier record*
   mr/ent->post
   {:include (merge {:topic {:only [:id :title]}}
                    author-inclusion-options)})
 
-(extend-type RabbleMapifier
+(extend-type RabbleDispatcher
   PostsController
-  (record [mapifier ent] (record* ent)))
+  (record [dispatcher ent] (record* ent)))
 
 (defn search
   [params]
@@ -50,7 +50,7 @@
 (defquery
   :return (fn [ctx]
             (mapify-rest
-             (mapifier ctx)
+             (dispatcher ctx)
              record
              (paginate (query-ents params) (or (config :per-page) 50) params))))
 
@@ -66,7 +66,7 @@
   :post! (create-content
           tx/create-post params auth record
           (fn [ctx params _]
-            (future (n/notify-users-of-post (mapifier ctx) params))))
+            (future (n/notify-users-of-post (dispatcher ctx) params))))
   :return record-in-ctx)
 
 (defdelete!

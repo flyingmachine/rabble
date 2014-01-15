@@ -4,8 +4,8 @@
             [rabble.db.maprules :as mr]
             [com.flyingmachine.datomic-junk :as dj]
             [flyingmachine.cartographer.core :as c]
-            rabble.middleware.mapifier)
-  (:import [rabble.middleware.mapifier RabbleMapifier]))
+            rabble.lib.dispatcher)
+  (:import [rabble.lib.dispatcher RabbleDispatcher]))
 
 (defprotocol Notifications
   (notify-users-of-topic [dispatcher topic params])
@@ -47,7 +47,7 @@
         topic (c/mapify (dj/ent topic-id) mr/ent->topic)]
     (email/send-reply-notification users topic (author author-id) params)))
 
-(extend-type RabbleMapifier
+(extend-type RabbleDispatcher
   Notifications
   (notify-users-of-topic [dispatcher topic params] (notify-users-of-topic* topic params))
   (notify-users-of-post [dispatcher params] (notify-users-of-post* params)))

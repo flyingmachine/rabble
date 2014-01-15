@@ -1,4 +1,5 @@
 (ns rabble.ring-app
+  (:require rabble.lib.dispatcher)
   (:use clojure.stacktrace
         [ring.adapter.jetty :only (run-jetty)]
         ring.middleware.params
@@ -9,10 +10,11 @@
         [compojure.core :as compojure]
         [rabble.middleware.routes :only (rabble-routes auth-routes)]
         [rabble.middleware.auth :only (auth)]
-        [rabble.middleware.mapifier :only (add-rabble-mapifier)]
+        [rabble.middleware.dispatcher :only (add-rabble-dispatcher)]
         [rabble.middleware.db-session-store :only (db-session-store)]
         [rabble.config :refer (config)]
-        [flyingmachine.webutils.utils :only (defnpd)]))
+        [flyingmachine.webutils.utils :only (defnpd)])
+  (:import [rabble.lib.dispatcher RabbleDispatcher]))
 
 (defn wrap-exception [f]
   (fn [request]
@@ -45,7 +47,7 @@
         stack (into [router] (conj (vec (reverse middlewares)) wrap))]
     (reduce #(%2 %1) stack)))
 
-(def app (site [auth add-rabble-mapifier] [auth-routes]))
+(def app (site [auth (add-rabble-dispatcher (RabbleDispatcher.))] [auth-routes]))
 
 (defn start
   "Start the jetty server"

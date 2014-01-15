@@ -51,9 +51,9 @@
                       :ent-count ent-count
                       :current-page current-page})))
 
-(defn mapifier
+(defn dispatcher
   [ctx]
-  (get-in ctx [:request :rabble :mapifier]))
+  (get-in ctx [:request :rabble :dispatcher]))
 
 (defn ctx-id
   [ctx]
@@ -66,7 +66,7 @@
 (defn exists?
   [mapification-fn]
   (fn [ctx]
-    (add-record-to-ctx (mapification-fn (mapifier ctx) (ctx-id ctx)))))
+    (add-record-to-ctx (mapification-fn (dispatcher ctx) (ctx-id ctx)))))
 
 (defn errors-in-ctx
   [ctx]
@@ -81,7 +81,7 @@
 (defmacro can-delete-record?
   [mapification-fn auth]
   `(fn [ctx#]
-     (let [record# (~mapification-fn (mapifier ctx#) (ctx-id ctx#))
+     (let [record# (~mapification-fn (dispatcher ctx#) (ctx-id ctx#))
            auth# ~auth]
        (if (or (author? record# auth#) (moderator? auth#))
          {:record record#}))))
@@ -89,7 +89,7 @@
 (defmacro can-update-record?
   [mapification-fn auth]
   `(fn [ctx#]
-     (let [record# (~mapification-fn (mapifier ctx#) (ctx-id ctx#))
+     (let [record# (~mapification-fn (dispatcher ctx#) (ctx-id ctx#))
            auth# ~auth]
        (if (and (not (:deleted record#))
                 (or (moderator? auth#)
@@ -105,7 +105,7 @@
   [creation-fn params mapification-fn [after-create nil]]
   (fn [ctx]
     (let [result (creation-fn params)
-          record (mapify-tx-result result (partial mapification-fn (mapifier ctx)))]
+          record (mapify-tx-result result (partial mapification-fn (dispatcher ctx)))]
       (if after-create (after-create ctx params record))
       {:record record})))
 
@@ -116,4 +116,4 @@
 (defn mapify-with
   [mapify-fn]
   (fn [ctx]
-    (mapify-fn (mapifier ctx) (ctx-id ctx))))
+    (mapify-fn (dispatcher ctx) (ctx-id ctx))))

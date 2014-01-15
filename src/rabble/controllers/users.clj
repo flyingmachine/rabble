@@ -9,7 +9,7 @@
             [com.flyingmachine.liberator-templates.sets.json-crud
              :refer (defshow defupdate!)]
             cemerick.friend.workflows)
-  (:import [rabble.middleware.mapifier RabbleMapifier])
+  (:import [rabble.lib.dispatcher RabbleDispatcher])
   (:use [flyingmachine.webutils.validation :only (if-valid)]
         [liberator.core :only [defresource]]
         rabble.models.permissions
@@ -18,18 +18,18 @@
         flyingmachine.webutils.utils))
 
 (defprotocol UsersController
-  (record [mapifier ent] [mapifier ent opts])
-  (authrecord [mapifier ent]))
+  (record [dispatcher ent] [dispatcher ent opts])
+  (authrecord [dispatcher ent]))
 
 (defmapifier record* mr/ent->user)
 (defmapifier authrecord* mr/ent->userauth)
 
-(extend-type RabbleMapifier
+(extend-type RabbleDispatcher
   UsersController
   (record
-    ([mapifier ent] (record* ent))
-    ([mapifier ent opts] (record* ent opts)))
-  (authrecord [mapifier ent] (authrecord* ent)))
+    ([dispatcher ent] (record* ent))
+    ([dispatcher ent opts] (record* ent opts)))
+  (authrecord [dispatcher ent] (authrecord* ent)))
 
 (defn attempt-registration
   [req]
@@ -39,7 +39,7 @@
       (if-valid
        params (:create validations/user) errors
        (cemerick.friend.workflows/make-auth
-        (mapify-tx-result (tx/create-user params) (partial record (:mapifier rabble)))
+        (mapify-tx-result (tx/create-user params) (partial record (:dispatcher rabble)))
         {:cemerick.friend/redirect-on-auth? false})
        (invalid errors)))))
 
@@ -80,8 +80,8 @@
 
 ;; TODO update with exists?
 (defn- password-params
-  [mapifier params]
-  (let [user (authrecord mapifier (id))]
+  [dispatcher params]
+  (let [user (authrecord dispatcher (id))]
     {:new-password (select-keys params [:new-password :new-password-confirmation])
      :current-password (merge (select-keys params [:current-password])
                               (select-keys user [:password]))}))
@@ -91,7 +91,7 @@
   :available-media-types ["application/json"]
 
   :malformed? (fn [ctx]
-                ((validator (password-params (mapifier ctx) params)
+                ((validator (password-params (dispatcher ctx) params)
                              validations/change-password)
                  ctx))
   :handle-malformed errors-in-ctx
