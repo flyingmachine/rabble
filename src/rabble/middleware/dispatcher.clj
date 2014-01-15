@@ -1,7 +1,7 @@
 (ns rabble.middleware.dispatcher
   (:require [rabble.lib.dispatcher]))
 
-(defn add-rabble-dispatcher
+(defn rabble-dispatcher
   [dispatcher]
   (fn [handler]
     (fn [request]

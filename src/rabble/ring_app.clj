@@ -10,7 +10,7 @@
         [compojure.core :as compojure]
         [rabble.middleware.routes :only (rabble-routes auth-routes)]
         [rabble.middleware.auth :only (auth)]
-        [rabble.middleware.dispatcher :only (add-rabble-dispatcher)]
+        [rabble.middleware.dispatcher :only (rabble-dispatcher)]
         [rabble.middleware.db-session-store :only (db-session-store)]
         [rabble.config :refer (config)]
         [flyingmachine.webutils.utils :only (defnpd)])
@@ -47,7 +47,7 @@
         stack (into [router] (conj (vec (reverse middlewares)) wrap))]
     (reduce #(%2 %1) stack)))
 
-(def app (site [auth (add-rabble-dispatcher (RabbleDispatcher.))] [auth-routes]))
+(def app (site [auth (rabble-dispatcher (RabbleDispatcher.))] [auth-routes]))
 
 (defn start
   "Start the jetty server"
