@@ -28,7 +28,7 @@
 
 (defn ents
   [auth]
-  (map first
+  (map (comp dj/ent first)
        (d/q '[:find ?topic
               :in $ ?userid
               :where [?watch :watch/user ?userid]
@@ -43,6 +43,6 @@
                (mapify-rest
                 (dispatcher ctx)
                 record
-                (paginate (reverse-by :db/last-posted-to-at (ents auth))
+                (paginate (reverse-by :topic/last-posted-to-at (ents auth))
                           (or (config :per-page) 50)
                           params))))
