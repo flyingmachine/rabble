@@ -4,6 +4,7 @@
             [datomic.api :as d]
             [rabble.db.maprules :as mr]
             [rabble.db.transactions.users :as tx]
+            [rabble.config :refer (config)]
             [flyingmachine.cartographer.core :as c]
             [cemerick.friend :as friend]
             [com.flyingmachine.liberator-templates.sets.json-crud
@@ -11,7 +12,7 @@
             cemerick.friend.workflows)
   (:import [rabble.lib.dispatcher RabbleDispatcher])
   (:use [flyingmachine.webutils.validation :only (if-valid)]
-        [liberator.core :only [defresource]]
+        [liberator.core :only (defresource)]
         rabble.models.permissions
         rabble.db.mapification
         rabble.controllers.shared
@@ -19,17 +20,20 @@
 
 (defprotocol UsersController
   (record [dispatcher ent] [dispatcher ent opts])
-  (authrecord [dispatcher ent]))
+  (authrecord [dispatcher ent])
+  (post [dispatcher ent]))
 
 (defmapifier record* mr/ent->user)
 (defmapifier authrecord* mr/ent->userauth)
+(defmapifier post* mr/ent->post {:include {:topic {:only [:title :id]}}})
 
 (extend-type RabbleDispatcher
   UsersController
   (record
     ([dispatcher ent] (record* ent))
     ([dispatcher ent opts] (record* ent opts)))
-  (authrecord [dispatcher ent] (authrecord* ent)))
+  (authrecord [dispatcher ent] (authrecord* ent))
+  (post [dispatcher ent] (post* ent)))
 
 (defn attempt-registration
   [req]
@@ -48,17 +52,22 @@
   "If the request gets this far, it means that user registration was successful."
   (if auth {:body auth}))
 
-(defn show-opts
-  [params]
-  (if (:include-posts params)
-    {:include
-     {:posts {:include
-              {:topic {:only [:title :id]}}}}}
-    {}))
+(defn posts
+  [dispatcher params author-id]
+  (mapify-rest 
+   dispatcher
+   post
+   (paginate (dj/all :post/content [:content/author author-id])
+             (config :per-page)
+             params)))
 
 (defshow
   [params]
-  :exists? (exists? (fn [m id] (record m id (show-opts params))))
+  :exists? (fn [ctx]
+             (if-let [r ((exists? #(record %1 %2)) ctx)]
+               (assoc-in r
+                         [:record :posts]
+                         (posts (dispatcher ctx) params (ctx-id ctx)))))
   :return record-in-ctx)
 
 (defn update!*

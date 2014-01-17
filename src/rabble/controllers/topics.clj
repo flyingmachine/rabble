@@ -72,7 +72,7 @@
             (mapify-rest
              (dispatcher ctx)
              query-record
-             (paginate (all params) (or (config :per-page) 50) params))))
+             (paginate (all params) (config :per-page) params))))
 
 (defshow
   :exists? (exists? record)

@@ -52,7 +52,7 @@
             (mapify-rest
              (dispatcher ctx)
              record
-             (paginate (query-ents params) (or (config :per-page) 50) params))))
+             (paginate (query-ents params) (config :per-page) params))))
 
 (defupdate!
   :invalid? (validator params (:update validations/post))

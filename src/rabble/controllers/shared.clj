@@ -65,8 +65,7 @@
 
 (defn exists?
   [mapification-fn]
-  (fn [ctx]
-    (add-record-to-ctx (mapification-fn (dispatcher ctx) (ctx-id ctx)))))
+  (fn [ctx] (add-record-to-ctx (mapification-fn (dispatcher ctx) (ctx-id ctx)))))
 
 (defn errors-in-ctx
   [ctx]
