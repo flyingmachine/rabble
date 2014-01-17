@@ -14,16 +14,25 @@
   [params]
   (merge params (dj/tempids :watch-id)))
 
+(defn watch
+  [topic-id author-id]
+  (dj/one [:watch/topic topic-id] [:watch/user author-id]))
+
+(defn create-t
+  [params post topic-id author-id]
+  (let [t [post
+           {:db/id topic-id :topic/last-posted-to-at (:post/created-at post)}
+           [:increment-watch-count topic-id author-id]]]
+    (if (watch topic-id author-id)
+      t
+      (conj t ))))
+
 (defn create-post
   [params]
   (let [final-params (add-create-params params)
         {:keys [topic-id author-id]} final-params
         post (post-params->txdata final-params)
-        result {:result (dj/t [post
-                               {:db/id topic-id
-                                :topic/last-posted-to-at (:post/created-at post)}
-                               (watch-params->txdata final-params)
-                               [:increment-watch-count topic-id author-id]])
+        result {:result (dj/t (create-t final-params post topic-id author-id))
                 :tempid (:db/id post)}]
     result))
 
