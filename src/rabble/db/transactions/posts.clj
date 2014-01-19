@@ -25,7 +25,7 @@
            [:increment-watch-count topic-id author-id]]]
     (if (watch topic-id author-id)
       t
-      (conj t ))))
+      (conj t (watch-params->txdata params)))))
 
 (defn create-post
   [params]
