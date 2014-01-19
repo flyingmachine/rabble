@@ -57,7 +57,7 @@
   (mapify-rest 
    dispatcher
    post
-   (paginate (dj/all :post/content [:content/author author-id])
+   (paginate (reverse-by :post/created-at (dj/all :post/content [:content/author author-id]))
              (config :per-page)
              params)))
 
