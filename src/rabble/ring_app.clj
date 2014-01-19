@@ -47,7 +47,7 @@
         stack (into [router] (conj (vec (reverse middlewares)) wrap))]
     (reduce #(%2 %1) stack)))
 
-(def app (site [auth (rabble-dispatcher (RabbleDispatcher.))] [auth-routes]))
+(def app (site [(rabble-dispatcher (RabbleDispatcher.)) auth] [auth-routes]))
 
 (defn start
   "Start the jetty server"
