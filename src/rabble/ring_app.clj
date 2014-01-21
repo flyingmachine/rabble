@@ -10,22 +10,14 @@
         [compojure.core :as compojure]
         [rabble.middleware.routes :only (rabble-routes auth-routes)]
         [rabble.middleware.auth :only (auth)]
+        [rabble.middleware.logging :only (wrap-exception)]
         [rabble.middleware.dispatcher :only (rabble-dispatcher)]
         [rabble.middleware.db-session-store :only (db-session-store)]
-        [rabble.config :refer (config)]
+        [rabble.config :only (config)]
         [flyingmachine.webutils.utils :only (defnpd)])
   (:import [rabble.lib.dispatcher RabbleDispatcher]))
 
-(defn wrap-exception [f]
-  (fn [request]
-    (try (f request)
-         (catch Exception e
-           (do
-             (.printStackTrace e)
-             {:status 500
-              :body "Exception caught"})))))
-
-(defn debug [f]
+(defn debug-middleware [f]
   (fn [{:keys [uri request-method params session] :as request}]
     (println params)
     (f request)))
