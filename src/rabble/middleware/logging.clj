@@ -21,10 +21,10 @@
     (try (f request)
          (catch Exception e
            (do
-             (println (format-request request))
              (->> (.getStackTrace e)
                   (map str)
                   (filter (partial stacktrace-filter ignore-namespaces))
+                  (into [(format-request request)])
                   j
                   error)
              {:status 500

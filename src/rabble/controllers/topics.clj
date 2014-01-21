@@ -69,7 +69,6 @@
 
 (defquery
   :return (fn [ctx]
-            (throw Exception)
             (mapify-rest
              (dispatcher ctx)
              query-record
