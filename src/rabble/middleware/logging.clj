@@ -24,7 +24,7 @@
              (->> (.getStackTrace e)
                   (map str)
                   (filter (partial stacktrace-filter ignore-namespaces))
-                  (into [(format-request request)])
+                  (into [(.getMessage e) (format-request request)])
                   j
                   error)
              {:status 500
