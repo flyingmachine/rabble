@@ -11,7 +11,7 @@
 (defmacro defmapifier
   [fn-name rules & mapify-opts]
   (let [fn-name fn-name]
-    `(defn- ~fn-name
+    `(defn ~fn-name
        ([to-map#]
           (~fn-name to-map# {}))
        ([to-map# addtl-mapify-args#]
