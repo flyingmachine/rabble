@@ -9,6 +9,7 @@
                  [org.clojure/core.memoize "0.5.6"]
                  [com.taoensso/timbre "3.0.0-RC4"]
                  [ring "1.2.1"]
+                 [ring-anti-forgery "0.3.0"]
                  [crypto-random "1.1.0"]
                  [markdown-clj "0.9.40"]
                  [clavatar "0.2.1"]

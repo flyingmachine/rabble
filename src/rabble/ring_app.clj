@@ -7,6 +7,7 @@
         ring.middleware.nested-params
         ring.middleware.session
         ring.middleware.format
+        ring.middleware.anti-forgery
         [compojure.core :as compojure]
         [rabble.middleware.routes :only (rabble-routes auth-routes)]
         [rabble.middleware.auth :only (auth)]
@@ -25,6 +26,7 @@
 (defn wrap
   [to-wrap]
   (-> to-wrap
+      (wrap-anti-forgery)
       (wrap-session {:cookie-name (or (config :session-name) "rabble-session")
                      :store (db-session-store {})})
       (wrap-restful-format :formats [:json-kw])
