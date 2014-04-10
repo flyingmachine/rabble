@@ -37,11 +37,18 @@
 
 (defnpd site
   [[middlewares []] [routes []]]
-  (let [router (apply compojure/routes (conj (vec routes) rabble-routes))
-        stack (into [router] (conj (vec (reverse middlewares)) wrap))]
+  (let [router (apply compojure/routes (concat routes [rabble-routes]))
+        stack (into [router] (concat (reverse middlewares) [wrap]))]
     (reduce #(%2 %1) stack)))
 
 (def app (site [(rabble-dispatcher (RabbleDispatcher.)) auth] [auth-routes]))
+
+(comment (let [router (compojure/routes auth-routes rabble-routes)
+               stack [router auth (rabble-dispatcher (RabbleDispatcher.)) wrap]]
+           (-> router
+               auth
+               dispatcher
+               wrap)))
 
 (defn start
   "Start the jetty server"
