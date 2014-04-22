@@ -36,7 +36,7 @@
 (def exists-in-ctx? record-in-ctx)
 
 (defn mapify-rest
-  [mapifier map-fn ents]
+  [map-fn ents]
   (conj (map map-fn (rest ents))
         (first ents)))
 
@@ -51,10 +51,6 @@
                       :ent-count ent-count
                       :current-page current-page})))
 
-(defn dispatcher
-  [ctx]
-  (get-in ctx [:request :rabble :dispatcher]))
-
 (defn ctx-id
   [ctx]
   (str->int (get-in ctx [:request :params :id])))
@@ -65,7 +61,7 @@
 
 (defn exists?
   [mapification-fn]
-  (fn [ctx] (add-record-to-ctx (mapification-fn (dispatcher ctx) (ctx-id ctx)))))
+  (fn [ctx] (add-record-to-ctx (mapification-fn (ctx-id ctx)))))
 
 (defn errors-in-ctx
   [ctx]
@@ -77,7 +73,7 @@
           :content/deleted true}]))
 
 ;; TODO figure out how to refactor this
-(defmacro can-delete-record?
+(defn can-delete-record?
   [mapification-fn auth]
   (fn [ctx]
     (let [record (mapification-fn (ctx-id ctx))]

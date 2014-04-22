@@ -50,12 +50,16 @@
   [method path [params nil] [auth nil]]
   (data (res method path params auth)))
 
+(defn reload
+  []
+  (db-tasks/reload)
+  (dj/t (read-resource "fixtures/seeds.edn")))
+
 (defmacro setup-db-background
   [& before]
   `(background
     (before :contents (tdb/with-test-db
-                        (db-tasks/reload)
-                        (dj/t (read-resource "fixtures/seeds.edn"))
+                        (reload)
                         ~@before))
     (around :facts (tdb/with-test-db ?form))))
 

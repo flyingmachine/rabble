@@ -9,35 +9,24 @@
             [rabble.controllers.shared :refer :all]
             [rabble.models.permissions :refer :all]
             [rabble.db.mapification :refer :all]
-            [rabble.lib.dispatcher :refer :all]
             [rabble.email.sending.notifications :as n]
             [rabble.config :refer (config)]
             [flyingmachine.webutils.utils :refer :all]
             [com.flyingmachine.liberator-templates.sets.json-crud
-             :refer (defquery defshow defcreate! defdelete!)])
-  (:import [rabble.lib.dispatcher RabbleDispatcher]))
+             :refer (defquery defshow defcreate! defdelete!)]))
 
-(defprotocol TopicsController
-  (query-record [dispatcher ent])
-  (record [dispatcher ent]))
-
-(defmapifier query-record*
+(defmapifier query-record
   mr/ent->topic
   {:include (merge {:first-post {:only [:id :likers :content]
                                  :include {:author {:only [:display-name]}}}
                     :tags {}}
                    author-inclusion-options)})
 
-(defmapifier record*
+(defmapifier record
   mr/ent->topic
   {:include {:posts {:include author-inclusion-options}
              :tags {}
              :watches {}}})
-
-(extend-type RabbleDispatcher
-  TopicsController
-  (query-record [dispatcher ent] (query-record* ent))
-  (record [dispatcher ent] (record* ent)))
 
 (defn organize
   "Topics come in [eid date] pairs"
@@ -70,7 +59,6 @@
 (defquery
   :return (fn [ctx]
             (mapify-rest
-             (dispatcher ctx)
              query-record
              (paginate (all params) (config :per-page) params))))
 
@@ -86,7 +74,7 @@
   :post! (create-content
           topic-tx/create-topic params auth query-record
           (fn [ctx params topic]
-            (future (n/notify-users-of-topic (dispatcher ctx) topic params))))
+            (future (n/notify-users-of-topic topic params))))
   :return record-in-ctx)
 
 (defdelete!

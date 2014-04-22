@@ -23,10 +23,9 @@
   :handle-not-found (fn [_] {:errors {:username ["That username isn't in our system"]}})
 
   :post! (fn [ctx]
-           (let [user (:record ctx)]
-             (future
-               (tx/create-token user)
-               (email/send-password-reset-token [(dj/ent (:db/id user))])))
+           (let [user (:record ctx)]               
+             (tx/create-token user)
+             (future (email/send-password-reset-token [(dj/ent (:db/id user))])))
            {})
 
   :handle-created {})
