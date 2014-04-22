@@ -26,7 +26,6 @@
 (defn wrap
   [to-wrap]
   (-> to-wrap
-      (wrap-anti-forgery)
       (wrap-session {:cookie-name (or (config :session-name) "rabble-session")
                      :store (db-session-store {})})
       (wrap-restful-format :formats [:json-kw])
@@ -41,14 +40,7 @@
         stack (into [router] (concat (reverse middlewares) [wrap]))]
     (reduce #(%2 %1) stack)))
 
-(def app (site [(rabble-dispatcher (RabbleDispatcher.)) auth] [auth-routes]))
-
-(comment (let [router (compojure/routes auth-routes rabble-routes)
-               stack [router auth (rabble-dispatcher (RabbleDispatcher.)) wrap]]
-           (-> router
-               auth
-               dispatcher
-               wrap)))
+(def app (site [wrap-anti-forgery auth] [auth-routes]))
 
 (defn start
   "Start the jetty server"

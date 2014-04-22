@@ -2,14 +2,17 @@
   (:require [com.flyingmachine.datomic-junk :as dj]
             [rabble.test.db-helpers :as tdb]
             [rabble.db.tasks :as db-tasks]
-            [rabble.ring-app :refer (app)]
-            [rabble.middleware.routes :as routes]
+            [rabble.ring-app :as ra]
+            [rabble.middleware.routes :as ar]
+            [rabble.middleware.auth :as am]
             [clojure.data.json :as json]
             [compojure.core :as compojure])
   (:use midje.sweet
         flyingmachine.webutils.utils
         rabble.paths
         [ring.mock.request :only [request header content-type]]))
+
+(def app (ra/site [am/auth] [ar/auth-routes]))
 
 (defn auth
   ([] (auth "flyingmachine"))
@@ -27,6 +30,8 @@
 (defnpd req
   [method path [params nil] [auth nil]]
   (-> (request method path params)
+      (assoc :session {"__anti-forgery-token" "foo"})
+      (assoc :headers {"x-csrf-token" "foo"})
       (content-type "application/json")
       (authenticated auth)))
 

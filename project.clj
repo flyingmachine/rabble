@@ -27,6 +27,7 @@
                  [com.flyingmachine/datomic-junk "0.1.3"]
                  [com.flyingmachine/liberator-templates "0.1.1"]]
 
+  :plugins [[lein-environ "0.4.0"]]
   :profiles {:dev {:source-paths ["dev"]
                    :dependencies [[com.datomic/datomic-free "0.9.4360"]
                                   [midje "1.5.0"]
