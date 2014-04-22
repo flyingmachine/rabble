@@ -3,8 +3,7 @@
             [rabble.db.mapification :refer (defmapifier)]
             [rabble.db.maprules :as mr]
             [com.flyingmachine.datomic-junk :as dj]
-            [flyingmachine.cartographer.core :as c]
-            rabble.lib.dispatcher))
+            [flyingmachine.cartographer.core :as c]))
 
 (defmapifier author mr/ent->user {:only [:email :username :display-name]})
 

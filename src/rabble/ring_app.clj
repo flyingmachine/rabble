@@ -1,5 +1,4 @@
 (ns rabble.ring-app
-  (:require rabble.lib.dispatcher)
   (:use clojure.stacktrace
         [ring.adapter.jetty :only (run-jetty)]
         ring.middleware.params
@@ -12,11 +11,9 @@
         [rabble.middleware.routes :only (rabble-routes auth-routes)]
         [rabble.middleware.auth :only (auth)]
         [rabble.middleware.logging :only (wrap-exception)]
-        [rabble.middleware.dispatcher :only (rabble-dispatcher)]
         [rabble.middleware.db-session-store :only (db-session-store)]
         [rabble.config :only (config)]
-        [flyingmachine.webutils.utils :only (defnpd)])
-  (:import [rabble.lib.dispatcher RabbleDispatcher]))
+        [flyingmachine.webutils.utils :only (defnpd)]))
 
 (defn debug-middleware [f]
   (fn [{:keys [uri request-method params session] :as request}]

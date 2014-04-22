@@ -29,7 +29,7 @@
       (if-valid
        params (:create validations/user) errors
        (cemerick.friend.workflows/make-auth
-        (mapify-tx-result (tx/create-user params) (partial record (:dispatcher rabble)))
+        (mapify-tx-result (tx/create-user params) record)
         {:cemerick.friend/redirect-on-auth? false})
        (invalid errors)))))
 
@@ -39,7 +39,7 @@
   (if auth {:body auth}))
 
 (defn posts
-  [dispatcher params author-id]
+  [params author-id]
   (mapify-rest 
    post
    (paginate (reverse-by :post/created-at (dj/all :post/content [:content/author author-id]))
