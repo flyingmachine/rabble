@@ -14,11 +14,9 @@
             [com.flyingmachine.liberator-templates.sets.json-crud
              :refer (defquery defupdate! defcreate! defdelete!)]))
 
-
-(defmapifier record
-  mr/ent->post
-  {:include (merge {:topic {:only [:id :title]}}
-                   author-inclusion-options)})
+(def post (mapifier mr/ent->post
+                    {:include (merge {:topic {:only [:id :title]}}
+                                     author-inclusion-options)}))
 
 (defn search
   [params]
@@ -43,24 +41,24 @@
 (defquery
   :return (fn [ctx]
             (mapify-rest
-             record
+             post
              (paginate (query-ents params) (config :per-page) params))))
 
 (defupdate!
   :invalid? (validator params (:update validations/post))
-  :authorized? (can-update-record? record auth)
+  :authorized? (can-update-record? post auth)
   :put! (update-record params tx/update-post)
-  :return (mapify-with record))
+  :return (mapify-with post))
 
 (defcreate!
   :invalid? (validator params (:create validations/post))
   :authorized? (logged-in? auth)
   :post! (create-content
-          tx/create-post params auth record
+          tx/create-post params auth post
           (fn [ctx params _]
             (future (n/notify-users-of-post params))))
   :return record-in-ctx)
 
 (defdelete!
-  :authorized? (can-delete-record? record auth)
+  :authorized? (can-delete-record? post auth)
   :delete! delete-record-in-ctx)

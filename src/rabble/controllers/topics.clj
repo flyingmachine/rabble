@@ -15,18 +15,20 @@
             [com.flyingmachine.liberator-templates.sets.json-crud
              :refer (defquery defshow defcreate! defdelete!)]))
 
-(defmapifier query-record
-  mr/ent->topic
-  {:include (merge {:first-post {:only [:id :likers :content]
-                                 :include {:author {:only [:display-name]}}}
-                    :tags {}}
-                   author-inclusion-options)})
+(def query-topic
+  (mapifier
+   mr/ent->topic
+   {:include (merge {:first-post {:only [:id :likers :content]
+                                  :include {:author {:only [:display-name]}}}
+                     :tags {}}
+                    author-inclusion-options)}))
 
-(defmapifier record
-  mr/ent->topic
-  {:include {:posts {:include author-inclusion-options}
-             :tags {}
-             :watches {}}})
+(def topic
+  (mapifier
+   mr/ent->topic
+   {:include {:posts {:include author-inclusion-options}
+              :tags {}
+              :watches {}}}))
 
 (defn organize
   "Topics come in [eid date] pairs"
@@ -56,14 +58,15 @@
   [params]
   (organize (d/q (build-query params) (dj/db))))
 
+
 (defquery
   :return (fn [ctx]
             (mapify-rest
-             query-record
+             query-topic
              (paginate (all params) (config :per-page) params))))
 
 (defshow
-  :exists? (exists? record)
+  :exists? (exists? topic)
   :return (fn [ctx]
             (if auth (watch-tx/reset-watch-count (id) (:id auth)))
             (record-in-ctx ctx)))
@@ -72,11 +75,11 @@
   :authorized? (logged-in? auth)
   :invalid? (validator params validations/topic)
   :post! (create-content
-          topic-tx/create-topic params auth query-record
+          topic-tx/create-topic params auth query-topic
           (fn [ctx params topic]
             (future (n/notify-users-of-topic topic params))))
   :return record-in-ctx)
 
 (defdelete!
-  :authorized? (can-delete-record? record auth)
+  :authorized? (can-delete-record? topic auth)
   :delete! delete-record-in-ctx)

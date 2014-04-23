@@ -11,10 +11,10 @@
         rabble.db.mapification
         flyingmachine.webutils.utils))
 
-(defmapifier record
-  mr/ent->topic
-  {:include (merge {:first-post {}}
-                   author-inclusion-options)})
+(def topic (mapifier
+            mr/ent->topic
+            {:include (merge {:first-post {}}
+                             author-inclusion-options)}))
 
 (defn ents
   [auth]
@@ -31,7 +31,7 @@
   :available-media-types ["application/json"]
   :handle-ok (fn [ctx]
                (mapify-rest
-                record
+                topic
                 (paginate (reverse-by :topic/last-posted-to-at (ents auth))
                           (or (config :per-page) 50)
                           params))))

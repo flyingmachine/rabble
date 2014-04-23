@@ -6,9 +6,9 @@
             [flyingmachine.cartographer.core :as c]
             [flyingmachine.webutils.utils :refer :all]))
 
-(defmapifier post-params->txdata* mr/post->txdata)
+(def post-params->txdata* (mapifier mr/post->txdata))
 (def post-params->txdata (comp remove-nils-from-map post-params->txdata*))
-(defmapifier watch-params->txdata mr/watch->txdata)
+(def watch-params->txdata (mapifier mr/watch->txdata))
 
 (defn- add-create-params
   [params]

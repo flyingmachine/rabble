@@ -17,9 +17,9 @@
         rabble.controllers.shared
         flyingmachine.webutils.utils))
 
-(defmapifier record mr/ent->user)
-(defmapifier authrecord mr/ent->userauth)
-(defmapifier post mr/ent->post {:include {:topic {:only [:title :id]}}})
+(def user (mapifier mr/ent->user))
+(def authuser (mapifier mr/ent->userauth))
+(def post (mapifier mr/ent->post {:include {:topic {:only [:title :id]}}}))
 
 (defn attempt-registration
   [req]
@@ -29,7 +29,7 @@
       (if-valid
        params (:create validations/user) errors
        (cemerick.friend.workflows/make-auth
-        (mapify-tx-result (tx/create-user params) record)
+        (mapify-tx-result (tx/create-user params) user)
         {:cemerick.friend/redirect-on-auth? false})
        (invalid errors)))))
 
@@ -49,7 +49,7 @@
 (defshow
   [params]
   :exists? (fn [ctx]
-             (if-let [r ((exists? #(record %1 %2)) ctx)]
+             (if-let [r ((exists? user) ctx)]
                (assoc-in r
                          [:record :posts]
                          (posts params (ctx-id ctx)))))
@@ -69,13 +69,13 @@
   :authorized? (current-user-id? (id) auth)
   :exists? (fn [_] (dj/ent (id)))
   :put! (fn [_] (update!* params))
-  :return (mapify-with record))
+  :return (mapify-with user))
 
 
 ;; TODO update with exists?
 (defn- password-params
   [params]
-  (let [user (authrecord (id))]
+  (let [user (authuser (id))]
     {:new-password (select-keys params [:new-password :new-password-confirmation])
      :current-password (merge (select-keys params [:current-password])
                               (select-keys user [:password]))}))

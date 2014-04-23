@@ -29,7 +29,7 @@
   ([]
      (create-post {})))
 
-(defmapifier post mr/ent->post)
+(def post (mapifier post mr/ent->post))
 
 (fact "create-post creates a post"
   (create-post)

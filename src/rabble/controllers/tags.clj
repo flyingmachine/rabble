@@ -7,11 +7,11 @@
   (:use rabble.controllers.shared
         rabble.db.mapification))
 
-(defmapifier record mr/ent->tag)
+(def tag (mapifier mr/ent->tag))
 
 (defquery [params]
   :return (fn [_]
             (->> :tag/name
                  dj/all
-                 (map record)
+                 (map tag)
                  (sort-by :name))))

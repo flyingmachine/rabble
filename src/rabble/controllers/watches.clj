@@ -12,12 +12,11 @@
         rabble.db.mapification
         flyingmachine.webutils.utils))
 
-(defmapifier record
-  mr/ent->watch)
+(def watch (mapifier mr/ent->watch))
 
 (defquery
   :return (fn [ctx]
-            (map (comp record first)
+            (map (comp watch first)
                  (d/q '[:find ?watch
                         :in $ ?userid
                         :where [?watch :watch/user ?userid]
@@ -28,7 +27,7 @@
 
 (defcreate!
   :authorized? (logged-in? auth)
-  :post! (create-record tx/create-watch params record)
+  :post! (create-record tx/create-watch params watch)
   :return record-in-ctx)
 
 (defdelete!

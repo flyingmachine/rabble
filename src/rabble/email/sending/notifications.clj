@@ -1,11 +1,11 @@
 (ns rabble.email.sending.notifications
   (:require [rabble.email.sending.senders :as email]
-            [rabble.db.mapification :refer (defmapifier)]
+            [rabble.db.mapification :refer (mapifier)]
             [rabble.db.maprules :as mr]
             [com.flyingmachine.datomic-junk :as dj]
             [flyingmachine.cartographer.core :as c]))
 
-(defmapifier author mr/ent->user {:only [:email :username :display-name]})
+(def author (mapifier mr/ent->user {:only [:email :username :display-name]}))
 
 (defn users
   ([author-id preference]
