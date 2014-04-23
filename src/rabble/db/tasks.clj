@@ -26,7 +26,8 @@
    :tags
    :user-prefs
    :password-reset
-   :topic-privacy])
+   :topic-privacy
+   :topic-last-post])
 
 (def schema-attr (or (config :schema-attr) :rabble/schema))
 

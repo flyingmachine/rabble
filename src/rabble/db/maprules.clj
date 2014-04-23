@@ -49,6 +49,9 @@
   (has-one :first-post
            :rules rabble.db.maprules/ent->post
            :retriever :topic/first-post)
+  (has-one :last-post
+           :rules rabble.db.maprules/ent->post
+           :retriever :topic/last-post)
   (has-one :author
            :rules rabble.db.maprules/ent->user
            :retriever :content/author)
@@ -139,6 +142,7 @@
   (attr :db/id (dbid :topic-id))
   (attr :topic/title :title)
   (attr :topic/first-post :post-id)
+  (attr :topic/last-post :post-id)
   (attr :topic/last-posted-to-at nowfn)
   (attr :topic/visibility (fn [topic]
                             (if-let [visibility (:visibility topic)]

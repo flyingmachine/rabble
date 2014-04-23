@@ -1,0 +1,6 @@
+[{:db/ident :topic/last-post
+  :db/id #db/id[:db.part/db]
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "Last post added to topic"
+  :db.install/_attribute :db.part/db}]

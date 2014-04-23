@@ -12,6 +12,7 @@
 
 (defn find-like
   [like]
+  (println "LIKE" like)
   (dj/one [:like/post (:like/post like)]
           [:like/user (:like/user like)]))
 
