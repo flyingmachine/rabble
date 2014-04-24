@@ -20,6 +20,8 @@
 (def user (mapifier mr/ent->user))
 (def authuser (mapifier mr/ent->userauth))
 (def post (mapifier mr/ent->post {:include {:topic {:only [:title :id]}}}))
+(def user->txdata (mapifier mr/user->txdata))
+
 
 (defn attempt-registration
   [req]
@@ -61,7 +63,7 @@
   (dj/t [[:db/retract (str->int (:id params)) :user/preferences tx/preferences]])
   (dj/t [(remove-nils-from-map
           (c/mapify params
-                    mr/user->txdata
+                    user->txdata
                     {:exclude [:user/username :user/password]}))]))
 
 (defupdate!
