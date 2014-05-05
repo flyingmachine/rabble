@@ -11,7 +11,6 @@
                  [ring "1.2.1"]
                  [ring-anti-forgery "0.3.0"]
                  [crypto-random "1.1.0"]
-                 [markdown-clj "0.9.40"]
                  [clavatar "0.2.1"]
                  [environ "0.4.0"]
                  [stencil "0.3.2"]

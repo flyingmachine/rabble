@@ -50,6 +50,7 @@
   ;; Users
   (authroute POST "/users" users/registration-success-response authfn)
   (route GET "/users/:id" users/show)
+  (route GET "/users" users/query)
   (authroute PUT "/users/:id" users/update! authfn)
 
   ;; Login

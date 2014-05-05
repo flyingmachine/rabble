@@ -8,7 +8,7 @@
             [flyingmachine.cartographer.core :as c]
             [cemerick.friend :as friend]
             [com.flyingmachine.liberator-templates.sets.json-crud
-             :refer (defshow defupdate!)]
+             :refer (defshow defupdate! defquery)]
             cemerick.friend.workflows)
   (:use [flyingmachine.webutils.validation :only (if-valid)]
         [liberator.core :only (defresource)]
@@ -56,6 +56,22 @@
                          [:record :posts]
                          (posts params (ctx-id ctx)))))
   :return record-in-ctx)
+
+(defn user-sort
+  [users]
+  (sort-by (fn [user]
+             (let [split (-> (:display-name user)
+                             (clojure.string/lower-case)
+                             (clojure.string/split #" "))]
+               (->> split
+                    (take 2)
+                    reverse
+                    (clojure.string/join " "))))
+           users))
+
+(defquery
+  [params]
+  :return (fn [ctx] (user-sort (map user (dj/all :user/username)))))
 
 (defn update!*
   [params]
