@@ -5,6 +5,8 @@
             [com.flyingmachine.datomic-junk :as dj]
             [flyingmachine.cartographer.core :as c]))
 
+(def author (mapifier mr/ent->user {:only [:email :username :display-name]}))
+
 (defn users
   ([author-id preference]
      (users author-id preference []))
