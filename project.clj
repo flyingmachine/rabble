@@ -1,4 +1,4 @@
-(defproject rabble "0.1.0-SNAPSHOT"
+(defproject rabble "0.1.1-SNAPSHOT"
   :description "forum api"
   :url "https://github.com/flyingmachine/rabble"
   :license {:name "MIT"
@@ -22,7 +22,7 @@
                  [ring-middleware-format "0.3.1"]
                  [com.flyingmachine/webutils "0.1.6"]
                  [flyingmachine/cartographer "0.1.1"]
-                 [com.flyingmachine/penny-black-postal "0.1.1"]
+                 [com.flyingmachine/penny-black-postal "0.1.3"]
                  [com.flyingmachine/datomic-junk "0.1.3"]
                  [com.flyingmachine/liberator-templates "0.1.1"]]
 
