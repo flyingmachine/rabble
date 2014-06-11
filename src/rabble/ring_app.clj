@@ -23,6 +23,7 @@
 (defn wrap
   [to-wrap]
   (-> to-wrap
+      wrap-anti-forgery
       (wrap-session {:cookie-name (or (config :session-name) "rabble-session")
                      :store (db-session-store {})})
       (wrap-restful-format :formats [:json-kw])
@@ -37,7 +38,7 @@
         stack (into [router] (concat (reverse middlewares) [wrap]))]
     (reduce #(%2 %1) stack)))
 
-(def app (site [wrap-anti-forgery auth] [auth-routes]))
+(def app (site [auth] [auth-routes]))
 
 (defn start
   "Start the jetty server"
