@@ -4,6 +4,8 @@
             [clojure.data.json :as json]
             [ring.middleware.anti-forgery :as af]))
 
+(def session-user-keys [:username :id :display-name])
+
 (defn session-js
   [value]
   {:body (str "angular.module('"
@@ -15,7 +17,7 @@
   [params auth]
   (let [af-token {:anti-forgery-token ring.middleware.anti-forgery/*anti-forgery-token*}
         session (json/write-str (if auth
-                                  (merge (select-keys auth [:username :id :display-name])
+                                  (merge (select-keys auth session-user-keys)
                                          af-token)
                                   af-token))]
     (session-js session)))

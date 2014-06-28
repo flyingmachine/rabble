@@ -8,9 +8,8 @@
             [flyingmachine.cartographer.core :as c]
             [cemerick.friend :as friend]
             [com.flyingmachine.liberator-templates.sets.json-crud
-             :refer (defshow defupdate!)]
+             :refer (defshow defupdate! defquery)]
             cemerick.friend.workflows)
-  (:import [rabble.lib.dispatcher RabbleDispatcher])
   (:use [flyingmachine.webutils.validation :only (if-valid)]
         [liberator.core :only (defresource)]
         rabble.models.permissions
@@ -18,22 +17,11 @@
         rabble.controllers.shared
         flyingmachine.webutils.utils))
 
-(defprotocol UsersController
-  (record [dispatcher ent] [dispatcher ent opts])
-  (authrecord [dispatcher ent])
-  (post [dispatcher ent]))
+(def user (mapifier mr/ent->user))
+(def authuser (mapifier mr/ent->userauth))
+(def post (mapifier mr/ent->post {:include {:topic {:only [:title :id]}}}))
+(def user->txdata (mapifier mr/user->txdata))
 
-(defmapifier record* mr/ent->user)
-(defmapifier authrecord* mr/ent->userauth)
-(defmapifier post* mr/ent->post {:include {:topic {:only [:title :id]}}})
-
-(extend-type RabbleDispatcher
-  UsersController
-  (record
-    ([dispatcher ent] (record* ent))
-    ([dispatcher ent opts] (record* ent opts)))
-  (authrecord [dispatcher ent] (authrecord* ent))
-  (post [dispatcher ent] (post* ent)))
 
 (defn attempt-registration
   [req]
@@ -43,7 +31,7 @@
       (if-valid
        params (:create validations/user) errors
        (cemerick.friend.workflows/make-auth
-        (mapify-tx-result (tx/create-user params) (partial record (:dispatcher rabble)))
+        (mapify-tx-result (tx/create-user params) user)
         {:cemerick.friend/redirect-on-auth? false})
        (invalid errors)))))
 
@@ -53,9 +41,8 @@
   (if auth {:body auth}))
 
 (defn posts
-  [dispatcher params author-id]
+  [params author-id]
   (mapify-rest 
-   dispatcher
    post
    (paginate (reverse-by :post/created-at (dj/all :post/content [:content/author author-id]))
              (config :per-page)
@@ -64,11 +51,27 @@
 (defshow
   [params]
   :exists? (fn [ctx]
-             (if-let [r ((exists? #(record %1 %2)) ctx)]
+             (if-let [r ((exists? user) ctx)]
                (assoc-in r
                          [:record :posts]
-                         (posts (dispatcher ctx) params (ctx-id ctx)))))
+                         (posts params (ctx-id ctx)))))
   :return record-in-ctx)
+
+(defn user-sort
+  [users]
+  (sort-by (fn [user]
+             (let [split (-> (:display-name user)
+                             (clojure.string/lower-case)
+                             (clojure.string/split #" "))]
+               (->> split
+                    (take 2)
+                    reverse
+                    (clojure.string/join " "))))
+           users))
+
+(defquery
+  [params]
+  :return (fn [ctx] (user-sort (map user (dj/all :user/username)))))
 
 (defn update!*
   [params]
@@ -76,7 +79,7 @@
   (dj/t [[:db/retract (str->int (:id params)) :user/preferences tx/preferences]])
   (dj/t [(remove-nils-from-map
           (c/mapify params
-                    mr/user->txdata
+                    user->txdata
                     {:exclude [:user/username :user/password]}))]))
 
 (defupdate!
@@ -84,13 +87,13 @@
   :authorized? (current-user-id? (id) auth)
   :exists? (fn [_] (dj/ent (id)))
   :put! (fn [_] (update!* params))
-  :return (mapify-with record))
+  :return (mapify-with user))
 
 
 ;; TODO update with exists?
 (defn- password-params
-  [dispatcher params]
-  (let [user (authrecord dispatcher (id))]
+  [params]
+  (let [user (authuser (id))]
     {:new-password (select-keys params [:new-password :new-password-confirmation])
      :current-password (merge (select-keys params [:current-password])
                               (select-keys user [:password]))}))
@@ -100,8 +103,8 @@
   :available-media-types ["application/json"]
 
   :malformed? (fn [ctx]
-                ((validator (password-params (dispatcher ctx) params)
-                             validations/change-password)
+                ((validator (password-params params)
+                            validations/change-password)
                  ctx))
   :handle-malformed errors-in-ctx
   

@@ -2,7 +2,6 @@
   (:require [com.flyingmachine.datomic-junk :as dj]
             [datomic.api :as d]
             [rabble.db.maprules :as mr]
-            rabble.lib.dispatcher
             [flyingmachine.cartographer.core :as c]
             [cemerick.friend :as friend]
             [rabble.config :refer (config)])
@@ -10,21 +9,12 @@
         rabble.controllers.shared
         rabble.models.permissions
         rabble.db.mapification
-        flyingmachine.webutils.utils)
-  (:import [rabble.lib.dispatcher RabbleDispatcher]))
+        flyingmachine.webutils.utils))
 
-(defprotocol WatchedTopicsController
-  (query-record [dispatcher ent])
-  (record [dispatcher ent]))
-
-(defmapifier record*
-  mr/ent->topic
-  {:include (merge {:first-post {}}
-                   author-inclusion-options)})
-
-(extend-type RabbleDispatcher
-  WatchedTopicsController
-  (record [dispatcher ent] (record* ent)))
+(def topic (mapifier
+            mr/ent->topic
+            {:include (merge {:first-post {}}
+                             author-inclusion-options)}))
 
 (defn ents
   [auth]
@@ -41,8 +31,7 @@
   :available-media-types ["application/json"]
   :handle-ok (fn [ctx]
                (mapify-rest
-                (dispatcher ctx)
-                record
+                topic
                 (paginate (reverse-by :topic/last-posted-to-at (ents auth))
                           (or (config :per-page) 50)
                           params))))

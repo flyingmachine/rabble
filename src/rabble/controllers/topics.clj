@@ -9,35 +9,26 @@
             [rabble.controllers.shared :refer :all]
             [rabble.models.permissions :refer :all]
             [rabble.db.mapification :refer :all]
-            [rabble.lib.dispatcher :refer :all]
             [rabble.email.sending.notifications :as n]
             [rabble.config :refer (config)]
             [flyingmachine.webutils.utils :refer :all]
             [com.flyingmachine.liberator-templates.sets.json-crud
-             :refer (defquery defshow defcreate! defdelete!)])
-  (:import [rabble.lib.dispatcher RabbleDispatcher]))
+             :refer (defquery defshow defcreate! defdelete!)]))
 
-(defprotocol TopicsController
-  (query-record [dispatcher ent])
-  (record [dispatcher ent]))
+(def query-topic
+  (mapifier
+   mr/ent->topic
+   {:include (merge {:first-post {:only [:id :likers :content]
+                                  :include {:author {:only [:display-name]}}}
+                     :tags {}}
+                    author-inclusion-options)}))
 
-(defmapifier query-record*
-  mr/ent->topic
-  {:include (merge {:first-post {:only [:id :likers :content]
-                                 :include {:author {:only [:display-name]}}}
-                    :tags {}}
-                   author-inclusion-options)})
-
-(defmapifier record*
-  mr/ent->topic
-  {:include {:posts {:include author-inclusion-options}
-             :tags {}
-             :watches {}}})
-
-(extend-type RabbleDispatcher
-  TopicsController
-  (query-record [dispatcher ent] (query-record* ent))
-  (record [dispatcher ent] (record* ent)))
+(def topic
+  (mapifier
+   mr/ent->topic
+   {:include {:posts {:include author-inclusion-options}
+              :tags {}
+              :watches {}}}))
 
 (defn organize
   "Topics come in [eid date] pairs"
@@ -67,15 +58,15 @@
   [params]
   (organize (d/q (build-query params) (dj/db))))
 
+
 (defquery
   :return (fn [ctx]
             (mapify-rest
-             (dispatcher ctx)
-             query-record
+             query-topic
              (paginate (all params) (config :per-page) params))))
 
 (defshow
-  :exists? (exists? record)
+  :exists? (exists? topic)
   :return (fn [ctx]
             (if auth (watch-tx/reset-watch-count (id) (:id auth)))
             (record-in-ctx ctx)))
@@ -84,11 +75,11 @@
   :authorized? (logged-in? auth)
   :invalid? (validator params validations/topic)
   :post! (create-content
-          topic-tx/create-topic params auth query-record
+          topic-tx/create-topic params auth query-topic
           (fn [ctx params topic]
-            (future (n/notify-users-of-topic (dispatcher ctx) topic params))))
+            (future (n/notify-users-of-topic topic params))))
   :return record-in-ctx)
 
 (defdelete!
-  :authorized? (can-delete-record? record auth)
+  :authorized? (can-delete-record? topic auth)
   :delete! delete-record-in-ctx)

@@ -8,20 +8,14 @@
     (dj/ent to-map)
     to-map))
 
-(defmacro defmapifier
-  [fn-name rules & mapify-opts]
-  (let [fn-name fn-name]
-    `(defn ~fn-name
-       ([to-map#]
-          (~fn-name to-map# {}))
-       ([to-map# addtl-mapify-args#]
-          (if-let [ent# (entify-if-id to-map#)]
-            (let [mapify-opts# (merge-with (fn [_# x#] x#) ~@mapify-opts addtl-mapify-args#)]
-              (c/mapify
-               ent#
-               ~rules
-               mapify-opts#))
-            nil)))))
+(defn mapifier
+  [rules & [mapify-opts]]
+  (let [mapify-opts (or mapify-opts {})]
+    (fn [to-map & [addtl-mapify-args]]
+      (if-let [ent (entify-if-id to-map)]
+        (let [mapify-opts (merge mapify-opts addtl-mapify-args)]
+          (c/mapify ent rules mapify-opts))
+        nil))))
 
 (defn tx-result->ent
   [tx-result]

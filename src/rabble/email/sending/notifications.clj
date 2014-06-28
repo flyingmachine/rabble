@@ -1,17 +1,11 @@
 (ns rabble.email.sending.notifications
   (:require [rabble.email.sending.senders :as email]
-            [rabble.db.mapification :refer (defmapifier)]
+            [rabble.db.mapification :refer (mapifier)]
             [rabble.db.maprules :as mr]
             [com.flyingmachine.datomic-junk :as dj]
-            [flyingmachine.cartographer.core :as c]
-            rabble.lib.dispatcher)
-  (:import [rabble.lib.dispatcher RabbleDispatcher]))
+            [flyingmachine.cartographer.core :as c]))
 
-(defprotocol Notifications
-  (notify-users-of-topic [dispatcher topic params])
-  (notify-users-of-post [dispatcher params]))
-
-(defmapifier author mr/ent->user {:only [:email :username :display-name]})
+(def author (mapifier mr/ent->user {:only [:email :username :display-name]}))
 
 (defn users
   ([author-id preference]
@@ -27,7 +21,7 @@
   [author-id]
   (users author-id "receive-new-topic-notifications"))
 
-(defn notify-users-of-topic*
+(defn notify-users-of-topic
   [topic params]
   (let [{:keys [author-id]} params
         users (users-to-notify-of-topic author-id)]
@@ -40,14 +34,9 @@
          [['?w :watch/topic topic-id]
           ['?w :watch/user '?u]]))
 
-(defn notify-users-of-post*
+(defn notify-users-of-post
   [params]
   (let [{:keys [topic-id author-id]} params
         users (users-to-notify-of-post topic-id author-id)
         topic (c/mapify (dj/ent topic-id) mr/ent->topic)]
     (email/send-reply-notification users topic (author author-id) params)))
-
-(extend-type RabbleDispatcher
-  Notifications
-  (notify-users-of-topic [dispatcher topic params] (notify-users-of-topic* topic params))
-  (notify-users-of-post [dispatcher params] (notify-users-of-post* params)))

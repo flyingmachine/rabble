@@ -7,6 +7,7 @@
 (setup-db-background)
 
 (facts "query returns topics and pagination info"
+  (reload)
   (let [data (response-data :get "/topics" {})]
     (first data) => {"page-count" 1 "ent-count" 2 "current-page" 1}
     data => (three-of map?)))

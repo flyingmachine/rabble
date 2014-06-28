@@ -36,8 +36,8 @@
 (def exists-in-ctx? record-in-ctx)
 
 (defn mapify-rest
-  [mapifier map-fn ents]
-  (conj (map (partial map-fn mapifier) (rest ents))
+  [map-fn ents]
+  (conj (map map-fn (rest ents))
         (first ents)))
 
 (defn paginate
@@ -51,10 +51,6 @@
                       :ent-count ent-count
                       :current-page current-page})))
 
-(defn dispatcher
-  [ctx]
-  (get-in ctx [:request :rabble :dispatcher]))
-
 (defn ctx-id
   [ctx]
   (str->int (get-in ctx [:request :params :id])))
@@ -65,7 +61,7 @@
 
 (defn exists?
   [mapification-fn]
-  (fn [ctx] (add-record-to-ctx (mapification-fn (dispatcher ctx) (ctx-id ctx)))))
+  (fn [ctx] (add-record-to-ctx (mapification-fn (ctx-id ctx)))))
 
 (defn errors-in-ctx
   [ctx]
@@ -77,34 +73,31 @@
           :content/deleted true}]))
 
 ;; TODO figure out how to refactor this
-(defmacro can-delete-record?
+(defn can-delete-record?
   [mapification-fn auth]
-  `(fn [ctx#]
-     (let [record# (~mapification-fn (dispatcher ctx#) (ctx-id ctx#))
-           auth# ~auth]
-       (if (or (author? record# auth#) (moderator? auth#))
-         {:record record#}))))
+  (fn [ctx]
+    (let [record (mapification-fn (ctx-id ctx))]
+      (if (or (author? record auth) (moderator? auth))
+        {:record record}))))
 
-(defmacro can-update-record?
+(defn can-update-record?
   [mapification-fn auth]
-  `(fn [ctx#]
-     (let [record# (~mapification-fn (dispatcher ctx#) (ctx-id ctx#))
-           auth# ~auth]
-       (if (and (not (:deleted record#))
-                (or (moderator? auth#)
-                    (author? record# auth#)))
-         {:record record#}))))
+  (fn [ctx]
+    (let [record (mapification-fn (ctx-id ctx))]
+      (if (and (not (:deleted record))
+               (or (moderator? auth)
+                   (author? record auth)))
+        {:record record}))))
 
 (defn update-record
   [params update-fn]
-  (fn [_]
-    (update-fn params)))
+  (fn [_] (update-fn params)))
 
 (defnpd create-record
   [creation-fn params mapification-fn [after-create nil]]
   (fn [ctx]
     (let [result (creation-fn params)
-          record (mapify-tx-result result (partial mapification-fn (dispatcher ctx)))]
+          record (mapify-tx-result result mapification-fn)]
       (if after-create (after-create ctx params record))
       {:record record})))
 
@@ -114,5 +107,4 @@
 
 (defn mapify-with
   [mapify-fn]
-  (fn [ctx]
-    (mapify-fn (dispatcher ctx) (ctx-id ctx))))
+  (fn [ctx] (mapify-fn (ctx-id ctx))))

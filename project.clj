@@ -1,4 +1,4 @@
-(defproject rabble "0.1.0-SNAPSHOT"
+(defproject rabble "0.1.1-SNAPSHOT"
   :description "forum api"
   :url "https://github.com/flyingmachine/rabble"
   :license {:name "MIT"
@@ -11,7 +11,6 @@
                  [ring "1.2.1"]
                  [ring-anti-forgery "0.3.0"]
                  [crypto-random "1.1.0"]
-                 [markdown-clj "0.9.40"]
                  [clavatar "0.2.1"]
                  [environ "0.4.0"]
                  [stencil "0.3.2"]
@@ -23,10 +22,11 @@
                  [ring-middleware-format "0.3.1"]
                  [com.flyingmachine/webutils "0.1.6"]
                  [flyingmachine/cartographer "0.1.1"]
-                 [com.flyingmachine/penny-black-postal "0.1.1"]
+                 [com.flyingmachine/penny-black-postal "0.1.3"]
                  [com.flyingmachine/datomic-junk "0.1.3"]
                  [com.flyingmachine/liberator-templates "0.1.1"]]
 
+  :plugins [[lein-environ "0.4.0"]]
   :profiles {:dev {:source-paths ["dev"]
                    :dependencies [[com.datomic/datomic-free "0.9.4360"]
                                   [midje "1.5.0"]
