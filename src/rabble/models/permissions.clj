@@ -10,10 +10,12 @@
 (defmethod moderator? clojure.lang.IPersistentMap
   [m] (moderator? (:username m)))
 
-(defn current-username [auth]
+(defn current-username
+  [auth]
   (:username auth))
 
-(defn current-user-id [auth]
+(defn current-user-id
+  [auth]
   (:id auth))
 
 (defn logged-in? [auth]
@@ -27,7 +29,8 @@
   [id auth]
   (not (current-user-id? id auth)))
 
-(defn can-modify-profile? [user auth]
+(defn can-modify-profile?
+  [user auth]
   (or
    (= user (current-username auth))
    (= (:username user) (current-username auth))))
@@ -42,7 +45,8 @@
     (= (get-in record [:author :username]) (:username auth)))))
 
 ;; Pretty sure there's something in onlisp about this
-(defmacro protect [check & body]
+(defmacro protect
+  [check & body]
   `(if (not ~check)
      {:status 401
       :body {:errors {:authorization ["You are not authorized to do that."]}}}
