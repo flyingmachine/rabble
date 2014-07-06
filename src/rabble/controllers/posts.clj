@@ -19,14 +19,14 @@
                                      author-inclusion-options)}))
 
 (defn search
-  [params]
+  [query]
   (map first
        (d/q '[:find ?post
               :in $ ?search
               :where
               [(fulltext $ :post/content ?search) [[?post ?content]]]]
             (dj/db)
-            (:q params))))
+            query)))
 
 (defn all
   []
@@ -36,7 +36,7 @@
   [params]
   (if (empty? (:q params))
     (all)
-    (search params)))
+    (search (:q params))))
 
 (defquery
   :return (fn [ctx]
