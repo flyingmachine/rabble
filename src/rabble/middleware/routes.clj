@@ -27,7 +27,7 @@
 (defroutes rabble-routes
   (authroute GET "/scripts/load-session.js" js/load-session authfn)
 
-  (GET "/topics" [] (g/resources :topic topic/resource-config {:topic {:list {:mapifier topic/list-topic}}}))
+  (GET "/topics" [] (:collection (g/resources :topic topic/create-resource-configs {:topic {:list {:mapifier topic/list-topic}}})))
 
   ;; Serve up angular app
   (apply compojure.core/routes

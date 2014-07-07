@@ -58,7 +58,7 @@
   [params]
   (organize (d/q (build-query params) (dj/db))))
 
-(defn resource-config
+(defn create-resource-configs
   [options app-config]
   {:list [:available-media-types ["application/json"]
           :handle-ok (fn [{{params :params} :request}]
