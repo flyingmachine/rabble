@@ -4,7 +4,9 @@
             [ring.util.response :as resp]
             [rabble.controllers.admin.users :as ausers]
             [cemerick.friend :as friend]
-            [flyingmachine.webutils.routes :refer :all])
+            [flyingmachine.webutils.routes :refer :all]
+            [rabble.resources.topic :as topic]
+            [rabble.resources.generate :as g])
   (:use [compojure.core :as compojure.core :only (GET PUT POST DELETE ANY defroutes)]
         rabble.config))
 
@@ -25,6 +27,8 @@
 (defroutes rabble-routes
   (authroute GET "/scripts/load-session.js" js/load-session authfn)
 
+  (GET "/topics" [] (g/resources :topic topic/resource-config {:topic {:list {:mapifier topic/list-topic}}}))
+
   ;; Serve up angular app
   (apply compojure.core/routes
          (map #(compojure.core/routes
@@ -38,7 +42,7 @@
                 (compojure.route/resources "/" {:root %}))
               (config :html-paths)))
 
-  (auth-resource-routes topics :only [:query :show :create! :delete!])
+  (auth-resource-routes topics :only [:show :create! :delete!])
   (auth-resource-routes watches :only [:query :create! :delete!])
   (auth-resource-routes watched-topics :only [:query])
   (auth-resource-routes posts :only [:query :create! :update! :delete!])
