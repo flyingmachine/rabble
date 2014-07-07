@@ -59,9 +59,17 @@
   (organize (d/q (build-query params) (dj/db))))
 
 (defn create-resource-configs
-  [options app-config]
-  {:list [:available-media-types ["application/json"]
-          :handle-ok (fn [{{params :params} :request}]
-                       (mapify-rest
-                        (-> options :list :mapifier)
-                        (paginate (all params) (or (app-config :per-page) 20) params)))]})
+  [options defaults app-config]
+  (merge-with
+   merge defaults
+   {:list {:handle-ok (fn [{{params :params} :request}]
+                        (mapify-rest
+                         (-> options :list :mapifier)
+                         (paginate (all params) (or (app-config :per-page) 20) params)))}
+    :create {:authorized? ctx-logged-in?
+             :invalid? (validator (-> options :create :validation))
+             :post! (create-content
+                     topic-tx/create-topic
+                     (-> options :list :mapifier)
+                     (-> options :create :after-create))
+             :handle-created record-in-ctx}}))

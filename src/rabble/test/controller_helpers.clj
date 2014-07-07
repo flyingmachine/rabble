@@ -13,6 +13,9 @@
         [ring.mock.request :only [request header content-type]]))
 
 (def app (ra/site [am/auth] [ar/auth-routes]))
+(defn test-route
+  [route]
+  (ra/site [am/auth] [route ar/auth-routes]))
 
 (defn auth
   ([] (auth "flyingmachine"))
@@ -30,15 +33,18 @@
 (defnpd req
   [method path [params nil] [auth nil]]
   (-> (request method path params)
-      (assoc :session {"__anti-forgery-token" "foo"})
-      (assoc :headers {"x-csrf-token" "foo"})
+      (assoc :session {:ring.middleware.anti-forgery/anti-forgery-token "foo"})
+      (header "x-csrf-token" "foo")
       (content-type "application/json")
       (authenticated auth)))
 
+(defnpd jreq
+  [method path [params nil] [auth nil]]
+  (req method path (json/write-str params) auth))
+
 (defnpd res
   [method path [params nil] [auth nil]]
-  (let [params (json/write-str params)]
-       (app (req method path params auth))))
+  (app (jreq method path params auth)))
 
 (defn data
   [response]

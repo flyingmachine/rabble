@@ -40,13 +40,17 @@
             seed
             options)))
 
+(defn config->resource
+  [config]
+  (apply resource (apply concat config)))
+
 (defn resource-for-keys
   [resource-configs & keys]
   (let [resource-config (select-keys resource-configs keys)]
     (condp = (count resource-config)
       0 nil
-      1 (apply resource (first (vals resource-config)))
-      2 (apply resource (combine-configs resource-config)))))
+      1 (config->resource (first (vals resource-config)))
+      2 (config->resource (combine-configs resource-config)))))
 
 (defn entry-resource
   [resource-configs]
@@ -57,7 +61,7 @@
   (resource-for-keys resource-configs :list :create))
 
 (defn resources
-  [resource-key create-resource-configs options]
-  (let [resource-configs (create-resource-configs (resource-key options) {})]
+  [create-resource-configs options defaults app-config]
+  (let [resource-configs (create-resource-configs options defaults app-config)]
     {:collection (collection-resource resource-configs)
      :entry (entry-resource resource-configs)}))
