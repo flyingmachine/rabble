@@ -15,9 +15,10 @@
         [rabble.config :only (config)]
         [flyingmachine.webutils.utils :only (defnpd)]))
 
-(defn debug-middleware [f]
+(defn debug-middleware
+  [f]
   (fn [{:keys [uri request-method params session] :as request}]
-    (println params)
+    (println "DEBUG:" request)
     (f request)))
 
 (defn wrap

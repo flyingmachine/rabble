@@ -10,12 +10,35 @@
   (:use midje.sweet
         flyingmachine.webutils.utils
         rabble.paths
+        [rabble.middleware.logging :only (wrap-exception)]
+        ring.middleware.params
+        ring.middleware.keyword-params
+        ring.middleware.nested-params
+        ring.middleware.session
+        ring.middleware.format
+        ring.middleware.anti-forgery
         [ring.mock.request :only [request header content-type]]))
 
-(def app (ra/site [am/auth] [ar/auth-routes]))
+(defn wrap-auth-token
+  [f]
+  (fn [request]
+    (f (assoc request :session {:ring.middleware.anti-forgery/anti-forgery-token"foo"}))))
+
+(defn wrap
+  [to-wrap]
+  (-> to-wrap
+      wrap-anti-forgery
+      wrap-auth-token
+      (wrap-restful-format :formats [:json-kw])
+      wrap-exception
+      wrap-keyword-params
+      wrap-nested-params
+      wrap-params))
+
+(def app (ra/site [wrap-auth-token am/auth] [ar/auth-routes]))
 (defn test-route
   [route]
-  (ra/site [am/auth] [route ar/auth-routes]))
+  (wrap route))
 
 (defn auth
   ([] (auth "flyingmachine"))
@@ -33,7 +56,6 @@
 (defnpd req
   [method path [params nil] [auth nil]]
   (-> (request method path params)
-      (assoc :session {:ring.middleware.anti-forgery/anti-forgery-token "foo"})
       (header "x-csrf-token" "foo")
       (content-type "application/json")
       (authenticated auth)))

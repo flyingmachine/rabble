@@ -22,20 +22,16 @@
   (def collection (:collection resources))
   (def entry (:entry resources)))
 
-(def resapp (test-route (compojure.core/ANY "/topics" [] collection)))
+(def test-app (test-route (compojure.core/ANY "/topics" [] collection)))
 
 (fact "query returns topics and pagination info"
   (reload)
-  (let [data (data (resapp (req :get "/topics")))]
+  (let [data (data (test-app (jreq :get "/topics")))]
     (first data) => {"page-count" 1 "ent-count" 2 "current-page" 1}
     data => (three-of map?)))
 
 (fact "creating a topic with a valid user results in success"
-  (let [response (resapp (jreq :post "/topics" {:content "test"} (auth)))
+  (let [response (test-app (jreq :post "/topics" {:content "test"} (auth)))
         data (data response)]
     response => (contains {:status 201})
     data => (contains {"post-count" 1})))
-
-
-
-
