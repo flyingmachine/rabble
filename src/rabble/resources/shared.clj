@@ -39,11 +39,7 @@
   [validation]
   "Used in invalid? which is why truth values are reversed"
   (fn [ctx]
-    (if-valid
-     (params ctx) validation errors
-     false
-     [true {:errors errors
-            :representation {:media-type "application/json"}}])))
+    false))
 
 (defn record-in-ctx
   [ctx]

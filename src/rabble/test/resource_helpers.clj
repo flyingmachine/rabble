@@ -42,13 +42,21 @@
   (wrap route))
 
 (defmacro defresources
-  [c e resource-decision-generator decision-options decision-defaults & app-config]
-  `(let [resources# (g/generate-resources ~resource-decision-generator
-                                          ~decision-options
-                                          ~decision-defaults
-                                          ~(or (first app-config) {}))]
-     (def ~c (:collection resources#))
-     (def ~e (:entry resources#))))
+  [resource-decision-generator decision-options decision-defaults & app-config]
+  (let [tr-name 'test-resources]
+    `(do
+       (defn ~tr-name
+         []
+         (g/generate-resources ~resource-decision-generator
+                               ~decision-options
+                               ~decision-defaults
+                               ~(or (first app-config) {})))
+       (defn ~(quote collection)
+         []
+         (:collection (~tr-name)))
+       (defn ~(quote entry)
+         []
+         (:entry (~tr-name))))))
 
 (defn auth
   ([] (auth "flyingmachine"))
