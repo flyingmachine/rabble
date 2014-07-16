@@ -6,8 +6,8 @@
             [flyingmachine.cartographer.core :as c]
             [flyingmachine.webutils.utils :refer :all]))
 
-(def post-params->txdata* (mapifier mr/post->txdata))
-(def post-params->txdata (comp remove-nils-from-map post-params->txdata*))
+(def post-params->txdata (comp remove-nils-from-map (mapifier mr/post->txdata)))
+(def post-params->topic-txdata (mapifier mr/post->topic-txdata))
 (def watch-params->txdata (mapifier mr/watch->txdata))
 
 (defn- add-create-params
@@ -21,9 +21,7 @@
 (defn post-transaction
   [params post topic-id author-id]
   (let [t [post
-           {:db/id topic-id
-            :topic/last-posted-to-at (:post/created-at post)
-            :topic/last-post (:db/id post)}
+           (post-params->topic-txdata post)
            [:increment-watch-count topic-id author-id]]]
     (if (watch topic-id author-id)
       t

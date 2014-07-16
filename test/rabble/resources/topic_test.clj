@@ -24,7 +24,6 @@
                 shared/default-decisions))
 
 (fact "query returns topics and pagination info"
-  (reload)
   (let [data (data ((test-app) (jreq :get "/topics")))]
     (first data) => {"page-count" 1 "ent-count" 2 "current-page" 1}
     data => (three-of map?)))

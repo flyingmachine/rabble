@@ -102,23 +102,21 @@
           :content/deleted true}]))
 
 (defnpd create-record
-  [ctx creation-fn params mapification-fn [after-create nil]]
-  (let [result (creation-fn params)
-        record (mapify-tx-result result mapification-fn)]
-    (if after-create (after-create ctx params record))
-    {:record record}))
+  [ctx creation-fn mapification-fn [after-create nil]]
+  (let [params (params ctx)]
+    (let [result (creation-fn params)
+          record (mapify-tx-result result mapification-fn)]
+      (if after-create (after-create ctx record))
+      {:record record})))
 
 (defnpd create-content
   [creation-fn mapification-fn [after-create nil]]
   (fn [ctx]
-    (let [auth (:auth ctx)
-          params (params ctx)]
-      (create-record
-       ctx
-       creation-fn
-       (merge params {:author-id (:id auth)})
-       mapification-fn
-       after-create))))
+    (create-record
+     (assoc-in ctx [:request :params :author-id] (get-in ctx [:auth :id]))
+     creation-fn
+     mapification-fn
+     after-create)))
 
 (def default-decisions
   (let [base {:available-media-types ["application/json"]

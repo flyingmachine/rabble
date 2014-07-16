@@ -7,10 +7,8 @@
             [flyingmachine.webutils.utils :refer :all]
             [clojure.string :refer (split trim lower-case)]))
 
-(def topic-params->txdata* (mapifier mr/topic->txdata))
-(def topic-params->txdata (comp remove-nils-from-map topic-params->txdata*))
+(def topic-params->txdata (comp remove-nils-from-map (mapifier mr/topic->txdata)))
 (def watch-params->txdata (mapifier mr/watch->txdata))
-(def user (mapifier mr/ent->user {:only [:email :username :display-name]}))
 (def post-params->txdata (mapifier mr/post->txdata))
 
 (defn- add-create-params

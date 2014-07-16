@@ -138,6 +138,12 @@
   (attr :post/created-at nowfn)
   (attr :content/author :author-id))
 
+;; pass the result of post->txdata to this mapifier
+(defmaprules post->topic-txdata
+  (attr :db/id (dbid :post/topic))
+  (attr :topic/last-posted-to-at :post/created-at)
+  (attr :topic/last-post :db/id))
+
 (defmaprules topic->txdata
   (attr :db/id (dbid :topic-id))
   (attr :topic/title :title)
