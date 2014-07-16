@@ -7,17 +7,9 @@
             [flyingmachine.webutils.utils :refer :all]
             [flyingmachine.webutils.validation :refer (if-valid)]))
 
-(def default-decisions
-  (let [base {:available-media-types ["application/json"]
-              :allowed-methods [:get]
-              :authorized? true
-              :respond-with-entity? true
-              :new? false}]
-    {:list base
-     :create (merge base {:allowed-methods [:post]
-                          :new? true})}))
-
-
+(defn ctx-id
+  [ctx]
+  (str->int (get-in ctx [:request :params :id])))
 
 (defn params
   [ctx]
@@ -48,6 +40,14 @@
      false
      [true {:errors errors
             :representation {:media-type "application/json"}}])))
+
+(defn add-record-to-ctx
+  [r]
+  (if r {:record r}))
+
+(defn exists?
+  [mapification-fn]
+  (fn [ctx] (add-record-to-ctx (mapification-fn (ctx-id ctx)))))
 
 (defn record-in-ctx
   [ctx]
@@ -93,3 +93,17 @@
        (merge params {:author-id (:id auth)})
        mapification-fn
        after-create))))
+
+(def default-decisions
+  (let [base {:available-media-types ["application/json"]
+              :allowed-methods [:get]
+              :authorized? true
+              :respond-with-entity? true
+              :new? false}]
+    {:list base
+     :create (merge base {:allowed-methods [:post]
+                          :new? true
+                          :handle-malformed errors-in-ctx})
+     :show base
+     :update base
+     :delete base}))

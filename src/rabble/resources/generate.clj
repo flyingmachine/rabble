@@ -46,11 +46,12 @@
 
 (defn resource-for-keys
   [resource-configs & keys]
-  (let [resource-config (select-keys resource-configs keys)]
-    (condp = (count resource-config)
-      0 nil
-      1 (config->resource (first (vals resource-config)))
-      2 (config->resource (combine-configs resource-config)))))
+  (let [resource-config (select-keys resource-configs keys)
+        config-count (count resource-config)]
+    (cond
+     (= 0 config-count) nil
+     (= 1 config-count) (config->resource (first (vals resource-config)))
+     :else (config->resource (combine-configs resource-config)))))
 
 (defn entry-resource
   [resource-configs]

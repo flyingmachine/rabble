@@ -68,9 +68,14 @@
                          (paginate (all params) (or (app-config :per-page) 20) params)))}
     :create {:authorized? ctx-logged-in?
              :malformed? (validator (-> options :create :validation))
-             :handle-malformed errors-in-ctx
              :post! (create-content
                      topic-tx/create-topic
                      (-> options :list :mapifier)
                      (-> options :create :after-create))
-             :handle-created record-in-ctx}}))
+             :handle-created record-in-ctx}
+
+    :show {:exists? (exists? (-> options :show :mapifier))
+           :handle-ok (fn [ctx]
+                        (if-let [user (auth ctx)]
+                          (watch-tx/reset-watch-count (ctx-id ctx) (:id user)))
+                        (record-in-ctx ctx))}}))

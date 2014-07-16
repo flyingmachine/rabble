@@ -36,7 +36,6 @@
       wrap-nested-params
       wrap-params))
 
-(def app (ra/site [wrap-auth-token am/auth] [ar/auth-routes]))
 (defn test-route
   [route]
   (wrap route))
@@ -49,6 +48,16 @@
                                           ~(or (first app-config) {}))]
      (def ~(quote collection) (:collection resources#))
      (def ~(quote entry) (:entry resources#))))
+
+(defn resource-app
+  [path resource-decision-generator decision-options decision-defaults & app-config]
+  (let [resources (g/generate-resources resource-decision-generator
+                                        decision-options
+                                        decision-defaults
+                                        (or (first app-config) {}))]
+    (test-route (compojure/routes
+                 (compojure/ANY path [] (:collection resources))
+                 (compojure/ANY (str path "/:id") [] (:entry resources))))))
 
 (defn auth
   ([] (auth "flyingmachine"))
@@ -74,19 +83,11 @@
   [method path [params nil] [auth nil]]
   (req method path (json/write-str params) auth))
 
-(defnpd res
-  [method path [params nil] [auth nil]]
-  (app (jreq method path params auth)))
-
 (defn data
-  [response]
-  (-> response
-      :body
-      json/read-str))
-
-(defnpd response-data
-  [method path [params nil] [auth nil]]
-  (data (res method path params auth)))
+  [{:keys [body]}]
+  (if (empty? body)
+    nil
+    (json/read-str body)))
 
 (defn reload
   []
