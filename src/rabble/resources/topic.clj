@@ -66,6 +66,7 @@
                         (mapify-rest
                          (-> options :list :mapifier)
                          (paginate (all params) (or (app-config :per-page) 20) params)))}
+
     :create {:authorized? ctx-logged-in?
              :malformed? (validator (-> options :create :validation))
              :post! (create-content
@@ -78,4 +79,8 @@
            :handle-ok (fn [ctx]
                         (if-let [user (auth ctx)]
                           (watch-tx/reset-watch-count (ctx-id ctx) (:id user)))
-                        (record-in-ctx ctx))}}))
+                        (record-in-ctx ctx))}
+
+    :delete {:exists? (exists? (-> options :show :mapifier))
+             :authorized? (can-delete-record? (-> options :show :mapifier))
+             :delete! delete-record-in-ctx}}))

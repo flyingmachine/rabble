@@ -9,5 +9,5 @@
 
 (defmacro with-test-db
   [& body]
-  `(binding [dj/*db-uri* test-db-uri]
+  `(with-redefs [dj/*db-uri* test-db-uri]
      ~@body))

@@ -5,7 +5,8 @@
             [rabble.ring-app :as ra])
   (:use midje.sweet
         rabble.paths
-        rabble.test.resource-helpers))
+        rabble.test.resource-helpers
+        rabble.test.db-helpers))
 
 (setup-db-background)
 
@@ -52,3 +53,15 @@
     (let [id (topic-id)]
       (data ((test-app) (jreq :get (topic-path id))))
       => (contains {"id" id}))))
+
+(facts "deleting a topic"
+  (facts "ownership"
+    (fact "deleting a topic as the author results in success"
+      ((test-app) (jreq :delete (topic-path (topic-id)) nil (auth "flyingmachine")))
+      => (contains {:status 204}))
+    (fact "deleting a non-existent topic results in nonexistent code"
+      ((test-app) (jreq :delete (topic-path "101010") nil (auth "flyingmachine")))
+      => (contains {:status 404}))
+    (fact "deleting a topic as not the author results in failure"
+      ((test-app) (jreq :delete (topic-path (topic-id)) nil (auth "joebob")))
+      => (contains {:status 401}))))

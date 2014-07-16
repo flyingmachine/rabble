@@ -71,9 +71,35 @@
                       :ent-count ent-count
                       :current-page current-page})))
 
+(defn can-x-record?
+  [mapification-fn predicate]
+  (fn [ctx]
+    (let [record (mapification-fn (ctx-id ctx))]
+      (if (predicate record (auth ctx))
+        {:record record}))))
+
+(defn can-delete-record?
+  [mapification-fn]
+  (can-x-record? mapification-fn
+                 (fn [record user]
+                   (or (author? record user) (moderator? user)))))
+
+(defn can-update-record?
+  [mapification-fn]
+  (can-x-record? mapification-fn
+                 (fn [record user]
+                   (and (not (:deleted record))
+                        (or (moderator? user)
+                            (author? record user))))))
+
 (defn update-record
   [update-fn params]
   (fn [_] (update-fn params)))
+
+(defn delete-record-in-ctx
+  [ctx]
+  (dj/t [{:db/id (get-in ctx [:record :id])
+          :content/deleted true}]))
 
 (defnpd create-record
   [ctx creation-fn params mapification-fn [after-create nil]]
@@ -106,4 +132,5 @@
                           :handle-malformed errors-in-ctx})
      :show base
      :update base
-     :delete base}))
+     :delete (merge base {:allowed-methods [:delete]
+                          :respond-with-entity? false})}))
