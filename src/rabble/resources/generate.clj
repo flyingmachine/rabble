@@ -60,8 +60,8 @@
   [resource-configs]
   (resource-for-keys resource-configs :list :create))
 
-(defn resources
-  [create-resource-configs options defaults app-config]
-  (let [resource-configs (create-resource-configs options defaults app-config)]
+(defn generate-resources
+  [resource-decision-generator decision-options decision-defaults app-config]
+  (let [resource-configs (resource-decision-generator decision-options decision-defaults app-config)]
     {:collection (collection-resource resource-configs)
      :entry (entry-resource resource-configs)}))

@@ -58,7 +58,7 @@
   [params]
   (organize (d/q (build-query params) (dj/db))))
 
-(defn create-resource-configs
+(defn resource-decisions
   [options defaults app-config]
   (merge-with
    merge defaults

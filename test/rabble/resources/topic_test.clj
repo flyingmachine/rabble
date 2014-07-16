@@ -2,11 +2,10 @@
   (:require [rabble.resources.topic :as topic]
             [rabble.resources.shared :as shared]
             [rabble.db.validations :as validations]
-            [rabble.resources.generate :as g]
             [rabble.ring-app :as ra])
   (:use midje.sweet
         rabble.paths
-        rabble.test.controller-helpers))
+        rabble.test.resource-helpers))
 
 (setup-db-background)
 
@@ -15,12 +14,8 @@
    :create {:validation validations/topic
             :after (fn [ctx param record])}})
 
-(let [resources (g/resources topic/create-resource-configs
-                             topic-options
-                             shared/default-decisions
-                             {})]
-  (def collection (:collection resources))
-  (def entry (:entry resources)))
+(defresources collection entry
+  topic/resource-decisions topic-options shared/default-decisions)
 
 (def test-app (test-route (compojure.core/ANY "/topics" [] collection)))
 
@@ -35,3 +30,11 @@
         data (data response)]
     response => (contains {:status 201})
     data => (contains {"post-count" 1})))
+
+(fact "creating a topic without a user results in failure"
+  (test-app (jreq :post "/topics" {:content "test"} nil))
+  => (contains {:status 401}))
+
+(fact "creating a topic without content returns errors"
+  (test-app (jreq :post "/topics" {} (auth)))
+  => (contains {:status 400}))
