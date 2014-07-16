@@ -67,7 +67,8 @@
                          (-> options :list :mapifier)
                          (paginate (all params) (or (app-config :per-page) 20) params)))}
     :create {:authorized? ctx-logged-in?
-             :invalid? (validator (-> options :create :validation))
+             :malformed? (validator (-> options :create :validation))
+             :handle-malformed errors-in-ctx
              :post! (create-content
                      topic-tx/create-topic
                      (-> options :list :mapifier)

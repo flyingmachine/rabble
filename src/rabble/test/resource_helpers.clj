@@ -43,20 +43,12 @@
 
 (defmacro defresources
   [resource-decision-generator decision-options decision-defaults & app-config]
-  (let [tr-name 'test-resources]
-    `(do
-       (defn ~tr-name
-         []
-         (g/generate-resources ~resource-decision-generator
-                               ~decision-options
-                               ~decision-defaults
-                               ~(or (first app-config) {})))
-       (defn ~(quote collection)
-         []
-         (:collection (~tr-name)))
-       (defn ~(quote entry)
-         []
-         (:entry (~tr-name))))))
+  `(let [resources# (g/generate-resources ~resource-decision-generator
+                                          ~decision-options
+                                          ~decision-defaults
+                                          ~(or (first app-config) {}))]
+     (def ~(quote collection) (:collection resources#))
+     (def ~(quote entry) (:entry resources#))))
 
 (defn auth
   ([] (auth "flyingmachine"))

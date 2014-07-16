@@ -35,11 +35,19 @@
   (let [auth-user (auth ctx)]
     [(logged-in? auth-user) {:auth auth-user}]))
 
+(defn errors-in-ctx
+  [ctx]
+  (select-keys ctx [:errors]))
+
 (defn validator
-  [validation]
   "Used in invalid? which is why truth values are reversed"
+  [validation]
   (fn [ctx]
-    false))
+    (if-valid
+     (params ctx) validation errors
+     false
+     [true {:errors errors
+            :representation {:media-type "application/json"}}])))
 
 (defn record-in-ctx
   [ctx]

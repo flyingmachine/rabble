@@ -16,7 +16,7 @@
 
 (defresources topic/resource-decisions topic-options shared/default-decisions)
 
-(def test-app (test-route (compojure.core/ANY "/topics" [] (collection))))
+(def test-app (test-route (compojure.core/ANY "/topics" [] collection)))
 
 (fact "query returns topics and pagination info"
   (reload)
