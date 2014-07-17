@@ -25,11 +25,11 @@
 
 (defn resource-decisions
   [options defaults app-config]
-  (merge-with
-   merge defaults
+  (merge-decision-defaults
    {:list {:handle-ok (fn [ctx]
                         (mapify-rest
                          (-> options :list :mapifier)
                          (paginate (reverse-by :topic/last-posted-to-at (ents (auth ctx)))
                                    (or (app-config :per-page) 50)
-                                   (params ctx))))}}))
+                                   (params ctx))))}}
+   defaults))

@@ -146,3 +146,9 @@
      :update (merge base {:allowed-methods [:put]})
      :delete (merge base {:allowed-methods [:delete]
                           :respond-with-entity? false})}))
+
+(defn merge-decision-defaults
+  [decisions defaults]
+  (merge-with merge
+              (select-keys defaults (keys decisions))
+              decisions))
