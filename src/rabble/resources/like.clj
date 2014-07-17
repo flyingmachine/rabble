@@ -33,4 +33,4 @@
                             (if-let [like (find-like (dissoc (clean-params ctx) :db/id))]
                               {:record (:db/id like)}
                               [false auth-error]))
-             :delete! (fn [ctx] (dj/retract (:record ctx)))}}))
+             :delete! (fn [ctx] @(dj/retract (:record ctx)))}}))
