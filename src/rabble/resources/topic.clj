@@ -9,10 +9,7 @@
             [rabble.models.permissions :refer :all]
             [rabble.db.mapification :refer :all]
             [rabble.email.sending.notifications :as n]
-            [rabble.config :refer (config)]
-            [flyingmachine.webutils.utils :refer :all]
-            [com.flyingmachine.liberator-templates.sets.json-crud
-             :refer (defquery defshow defcreate! defdelete!)]))
+            [flyingmachine.webutils.utils :refer :all]))
 
 (def list-topic
   ^{:doc "Topic mapifier for collection responses"}

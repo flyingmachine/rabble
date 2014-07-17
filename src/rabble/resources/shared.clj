@@ -27,11 +27,13 @@
   {:errors errors
    :representation {:media-type "application/json"}})
 
+(def auth-error (errors-map {:authorization "Not authorized."}))
+
 (defn ctx-logged-in?
   [ctx]
   (if-let [auth-user (auth ctx)]
     [true {:auth auth-user}]
-    [false (errors-map {:authorization "Not authorized."})]))
+    [false auth-error]))
 
 (defn errors-in-ctx
   [ctx]
@@ -82,7 +84,7 @@
     (let [record (mapification-fn (ctx-id ctx))]
       (if (predicate record (auth ctx))
         [true {:record record}]
-        [false (errors-map {:authorization "Not authorized."})]))))
+        [false auth-error]))))
 
 (defn can-delete-record?
   [mapification-fn]

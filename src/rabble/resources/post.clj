@@ -6,13 +6,10 @@
             [rabble.db.mapification :refer :all]
             [rabble.resources.shared :refer :all]
             [rabble.models.permissions :refer :all]
-            [rabble.config :refer (config)]
             [rabble.email.sending.notifications :as n]
             [flyingmachine.cartographer.core :as c]
             [com.flyingmachine.datomic-junk :as dj]
-            [flyingmachine.webutils.utils :refer :all]
-            [com.flyingmachine.liberator-templates.sets.json-crud
-             :refer (defquery defupdate! defcreate! defdelete!)]))
+            [flyingmachine.webutils.utils :refer :all]))
 
 (def post (mapifier mr/ent->post
                     {:include (merge {:topic {:only [:id :title]}}
@@ -62,5 +59,7 @@
 
 (def default-options
   {:list {:mapifier post}
-   :create {:validation (:create validations/post)}
+   :create {:validation (:create validations/post)
+            :after-create (fn [ctx _]
+                            (future (n/notify-users-of-post (params ctx))))}
    :show {:mapifier post}})
