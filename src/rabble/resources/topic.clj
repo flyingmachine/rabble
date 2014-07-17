@@ -16,6 +16,7 @@
              :refer (defquery defshow defcreate! defdelete!)]))
 
 (def list-topic
+  ^{:doc "Topic mapifier for collection responses"}
   (mapifier
    mr/ent->topic
    {:include (merge {:first-post {:only [:id :likers :content]
@@ -24,6 +25,7 @@
                     author-inclusion-options)}))
 
 (def topic
+  ^{:doc "Topic mapifier for entry responses"}
   (mapifier
    mr/ent->topic
    {:include {:posts {:include author-inclusion-options}
