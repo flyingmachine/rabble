@@ -4,9 +4,6 @@
             [rabble.db.maprules :as mr]
             [rabble.db.mapification :refer :all]
             [rabble.resources.shared :refer :all]
-            [rabble.models.permissions :refer :all]
-            [rabble.email.sending.notifications :as n]
-            [flyingmachine.cartographer.core :as c]
             [com.flyingmachine.datomic-junk :as dj]
             [flyingmachine.webutils.utils :refer :all]))
 

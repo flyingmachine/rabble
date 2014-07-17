@@ -2,8 +2,7 @@
   (:require [com.flyingmachine.datomic-junk :as dj]
             [rabble.resources.like :as like]
             [rabble.resources.shared :as shared]
-            [rabble.db.validations :as validations]
-            [rabble.ring-app :as ra])
+            [rabble.db.validations :as validations])
   (:use midje.sweet
         rabble.paths
         rabble.test.resource-helpers

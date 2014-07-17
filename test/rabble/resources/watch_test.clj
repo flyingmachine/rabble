@@ -34,4 +34,3 @@
   (let [response (app-req test-app :delete (str "/watches/" (:db/id (watch))) nil (auth "flyingmachine"))]
     (watch) => nil
     response => (contains {:status 204})))
-
