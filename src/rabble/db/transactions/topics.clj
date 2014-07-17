@@ -41,6 +41,8 @@
     (into [[:db/add (:topic-id params) :content/tags tag-ids]]
           new-tags)))
 
+;; TODO possibly generalize this by accepting x-params->txdata
+;; functions whic append to transaction
 (defn create-topic
   [params]
   (let [final-params (add-create-params params)

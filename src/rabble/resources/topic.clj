@@ -1,11 +1,10 @@
 (ns rabble.resources.topic
   (:require [datomic.api :as d]
-            [rabble.db.validations :as validations]
             [com.flyingmachine.datomic-junk :as dj]
+            [rabble.db.validations :as validations]
             [rabble.db.maprules :as mr]
             [rabble.db.transactions.topics :as topic-tx]
             [rabble.db.transactions.watches :as watch-tx]
-            [liberator.core :refer [defresource]]
             [rabble.resources.shared :refer :all]
             [rabble.models.permissions :refer :all]
             [rabble.db.mapification :refer :all]
@@ -86,3 +85,10 @@
     :delete {:exists? (exists? (-> options :show :mapifier))
              :authorized? (can-delete-record? (-> options :show :mapifier))
              :delete! delete-record-in-ctx}}))
+
+(def default-options
+  {:list {:mapifier list-topic}
+   :create {:after-create (fn [ctx topic]
+                            (future (n/notify-users-of-topic topic (params ctx))))
+            :validation validations/topic}
+   :show {:mapifier topic}})
