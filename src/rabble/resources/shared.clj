@@ -22,10 +22,16 @@
   [ctx]
   (friend/current-authentication (:request ctx)))
 
+(defn errors-map
+  [errors]
+  {:errors errors
+   :representation {:media-type "application/json"}})
+
 (defn ctx-logged-in?
   [ctx]
-  (let [auth-user (auth ctx)]
-    [(logged-in? auth-user) {:auth auth-user}]))
+  (if-let [auth-user (auth ctx)]
+    [true {:auth auth-user}]
+    [false (errors-map {:authorization "Not authorized."})]))
 
 (defn errors-in-ctx
   [ctx]
@@ -38,8 +44,7 @@
     (if-valid
      (params ctx) validation errors
      false
-     [true {:errors errors
-            :representation {:media-type "application/json"}}])))
+     [true (errors-map errors)])))
 
 (defn add-record-to-ctx
   [r]
@@ -76,7 +81,8 @@
   (fn [ctx]
     (let [record (mapification-fn (ctx-id ctx))]
       (if (predicate record (auth ctx))
-        {:record record}))))
+        [true {:record record}]
+        [false (errors-map {:authorization "Not authorized."})]))))
 
 (defn can-delete-record?
   [mapification-fn]
@@ -122,12 +128,14 @@
   (let [base {:available-media-types ["application/json"]
               :allowed-methods [:get]
               :authorized? true
+              :handle-unauthorized errors-in-ctx
+              :handle-malformed errors-in-ctx
               :respond-with-entity? true
               :new? false}]
     {:list base
      :create (merge base {:allowed-methods [:post]
                           :new? true
-                          :handle-malformed errors-in-ctx})
+                          :handle-created record-in-ctx})
      :show base
      :update base
      :delete (merge base {:allowed-methods [:delete]

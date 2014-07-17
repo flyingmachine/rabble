@@ -73,8 +73,7 @@
              :post! (create-content
                      topic-tx/create-topic
                      (-> options :list :mapifier)
-                     (-> options :create :after-create))
-             :handle-created record-in-ctx}
+                     (-> options :create :after-create))}
 
     :show {:exists? (exists? (-> options :show :mapifier))
            :handle-ok (fn [ctx]

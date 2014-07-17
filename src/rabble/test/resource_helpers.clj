@@ -89,6 +89,14 @@
     nil
     (json/read-str body)))
 
+(defnpd app-req
+  [app method url [params nil] [auth nil]]
+  ((app) (jreq method url params auth)))
+
+(defnpd app-data
+  [app method url [params nil] [auth nil]]
+  (data (app-req app method url params auth)))
+
 (defn reload
   []
   (db-tasks/reload)
