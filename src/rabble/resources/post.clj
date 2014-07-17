@@ -47,18 +47,18 @@
                          (-> options :list :mapifier)
                          (paginate (query-ents params) (app-config :per-page) params)))}
     
-    :create {:invalid? (validator (-> options :create :validation))
+    :create {:malformed? (validator (-> options :create :validation))
              :authorized? ctx-logged-in?
              :post! (create-content
                      tx/create-post
                      (-> options :list :mapifier)
                      (-> options :create :after-create))}
-    :update {:invalid? (fn [ctx]
-                         (validator (params ctx) (:delete validations/post)))
-             :authorized? (options :update :authorized?)
-             :put! (fn [{{params :params} :request}]
-                     ())}
-    :delete {}}))
+    :update {:malformed? (validator (-> options :update :validation))
+             :authorized? (can-update-record? (-> options :show :mapifier))
+             :put! (update-record tx/update-post)
+             :handle-ok (mapify-with (-> options :show :mapifier))}
+    :delete {:authorized? (can-delete-record? (-> options :show :mapifier))
+             :delete! delete-record-in-ctx}}))
 
 (def default-options
   {:list {:mapifier post}

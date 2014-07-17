@@ -99,8 +99,12 @@
                             (author? record user))))))
 
 (defn update-record
-  [update-fn params]
-  (fn [_] (update-fn params)))
+  [update-fn]
+  (fn [ctx] (update-fn (params ctx))))
+
+(defn mapify-with
+  [mapify-fn]
+  (fn [ctx] (mapify-fn (ctx-id ctx))))
 
 (defn delete-record-in-ctx
   [ctx]
@@ -137,6 +141,6 @@
                           :new? true
                           :handle-created record-in-ctx})
      :show base
-     :update base
+     :update (merge base {:allowed-methods [:put]})
      :delete (merge base {:allowed-methods [:delete]
                           :respond-with-entity? false})}))
