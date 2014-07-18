@@ -4,7 +4,6 @@
             [rabble.resources.shared :as shared]
             [rabble.db.validations :as validations])
   (:use midje.sweet
-        rabble.paths
         rabble.test.resource-helpers
         rabble.test.db-helpers))
 
