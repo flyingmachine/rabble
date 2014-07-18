@@ -42,14 +42,14 @@
   (wrap route))
 
 (defnpd resource-app
-  [path resource-decision-generator [decision-options {}] [decision-defaults shared/default-decisions] [app-config nil]]
+  [path resource-decision-generator [decision-options {}] [decision-defaults shared/default-decisions] [entry-key ":id"]]
   (let [resources (g/generate-resources resource-decision-generator
                                         decision-options
                                         decision-defaults
-                                        (or (first app-config) {}))]
+                                        {})]
     (test-route (compojure/routes
                  (compojure/ANY path [] (:collection resources))
-                 (compojure/ANY (str path "/:id") [] (:entry resources))))))
+                 (compojure/ANY (str path "/" entry-key) [] (:entry resources))))))
 
 (defn auth
   ([] (auth "flyingmachine"))

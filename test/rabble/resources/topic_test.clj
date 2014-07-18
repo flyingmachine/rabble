@@ -1,8 +1,7 @@
 (ns rabble.resources.topic-test
   (:require [rabble.resources.topic :as topic]
             [rabble.resources.shared :as shared]
-            [rabble.db.validations :as validations]
-            [rabble.ring-app :as ra])
+            [rabble.db.validations :as validations])
   (:use midje.sweet
         rabble.paths
         rabble.test.resource-helpers

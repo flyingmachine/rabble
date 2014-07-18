@@ -1,7 +1,6 @@
 (ns rabble.resources.admin.user-test
   (:require [com.flyingmachine.datomic-junk :as dj]
-            [rabble.resources.admin.user :as user]
-            [rabble.db.validations :as validations])
+            [rabble.resources.admin.user :as user])
   (:use midje.sweet
         rabble.paths
         rabble.test.resource-helpers

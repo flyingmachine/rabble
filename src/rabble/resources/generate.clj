@@ -1,5 +1,5 @@
 (ns rabble.resources.generate
-  (:require [liberator.core :refer [resource]]
+  (:require [liberator.core :refer [resource default-functions]]
             [com.flyingmachine.config :as config]))
 
 (def todo nil)
@@ -25,9 +25,10 @@
     (let [request-method (get-in ctx [:request :request-method])
           resource-key (request-method method-map)
           entry (get-in config-map [resource-key option])]
-      (if (fn? entry)
-        (entry ctx)
-        entry))))
+      (cond
+       (fn? entry) (entry ctx)
+       (nil? entry) (option default-functions)
+       :else entry))))
 
 (defn combine-configs
   [config-map]

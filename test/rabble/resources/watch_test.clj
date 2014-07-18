@@ -1,9 +1,7 @@
 (ns rabble.resources.like-test
   (:require [com.flyingmachine.datomic-junk :as dj]
             [rabble.resources.watch :as watch]
-            [rabble.resources.shared :as shared]
-            [rabble.db.validations :as validations]
-            [rabble.ring-app :as ra])
+            [rabble.resources.shared :as shared])
   (:use midje.sweet
         rabble.paths
         rabble.test.resource-helpers
