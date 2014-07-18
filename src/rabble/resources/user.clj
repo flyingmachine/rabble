@@ -10,7 +10,7 @@
             [com.flyingmachine.datomic-junk :as dj]
             [flyingmachine.webutils.utils :refer :all]))
 
-(def user (mapifier mr/ent->user))
+(def user (mapifier mr/ent->user {:exclude [:preferences]}))
 (def post (mapifier mr/ent->post {:include {:topic {:only [:title :id]}}}))
 (def user->txdata (mapifier mr/user->txdata {:exclude [:user/username :user/password]}))
 
@@ -19,7 +19,7 @@
   (mapify-rest 
    mapifier
    (paginate (reverse-by :post/created-at (dj/all :post/content [:content/author author-id]))
-             (app-config :per-page)
+             (or (app-config :per-page) 20)
              params)))
 
 (defn user-sort
@@ -27,13 +27,15 @@
   TODO improve"
   [users]
   (sort-by (fn [user]
-             (let [split (-> (:display-name user)
-                             (clojure.string/lower-case)
-                             (clojure.string/split #" "))]
-               (->> split
-                    (take 2)
-                    reverse
-                    (clojure.string/join " "))))
+             (if-let [display-name (:display-name user)]
+               (let [split (-> display-name
+                               (clojure.string/lower-case)
+                               (clojure.string/split #" "))]
+                 (->> split
+                      (take 2)
+                      reverse
+                      (clojure.string/join " ")))
+               (:username user)))
            users))
 
 (defn resource-decisions
@@ -47,7 +49,8 @@
                                   (posts (params ctx)
                                          (ctx-id ctx)
                                          (-> options :show :post-mapifier)
-                                         app-config))))}
+                                         app-config))))
+           :handle-ok record-in-ctx}
     :list {:handle-ok (fn [ctx]
                         (user-sort (map (-> options :list :user-mapifier)
                                         (dj/all :user/username))))}

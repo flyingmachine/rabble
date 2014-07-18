@@ -19,7 +19,13 @@
   []
   (resource-app "/users" user/resource-decisions user-options))
 
+(fact "You can view all users"
+  (count (app-data test-app :get "/users"))
+  => 2)
 
+(fact "You can view a user"
+  (app-data test-app :get (user-path (:id (auth))))
+  => (contains {"email" "daniel@flyingmachinestudios.com"}))
 
 (facts "Users can update stuff"
   (fact "A user can update his own profile"
