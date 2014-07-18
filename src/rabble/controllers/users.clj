@@ -6,10 +6,8 @@
             [rabble.db.transactions.users :as tx]
             [rabble.config :refer (config)]
             [flyingmachine.cartographer.core :as c]
-            [cemerick.friend :as friend]
             [com.flyingmachine.liberator-templates.sets.json-crud
-             :refer (defshow defupdate! defquery)]
-            cemerick.friend.workflows)
+             :refer (defshow defupdate! defquery)])
   (:use [flyingmachine.webutils.validation :only (if-valid)]
         [liberator.core :only (defresource)]
         rabble.models.permissions
@@ -21,19 +19,6 @@
 (def authuser (mapifier mr/ent->userauth))
 (def post (mapifier mr/ent->post {:include {:topic {:only [:title :id]}}}))
 (def user->txdata (mapifier mr/user->txdata))
-
-
-(defn attempt-registration
-  [req]
-  (let [{:keys [uri request-method params session rabble]} req]
-    (when (and (= uri "/users")
-               (= request-method :post))
-      (if-valid
-       params (:create validations/user) errors
-       (cemerick.friend.workflows/make-auth
-        (mapify-tx-result (tx/create-user params) user)
-        {:cemerick.friend/redirect-on-auth? false})
-       (invalid errors)))))
 
 (defn registration-success-response
   [params auth]
