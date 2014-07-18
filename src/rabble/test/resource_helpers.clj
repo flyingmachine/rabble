@@ -7,6 +7,7 @@
             [rabble.middleware.auth :as am]
             [clojure.data.json :as json]
             [compojure.core :as compojure]
+            [rabble.resources.shared :as shared]
             [rabble.resources.generate :as g])
   (:use midje.sweet
         flyingmachine.webutils.utils
@@ -40,17 +41,8 @@
   [route]
   (wrap route))
 
-(defmacro defresources
-  [resource-decision-generator decision-options decision-defaults & app-config]
-  `(let [resources# (g/generate-resources ~resource-decision-generator
-                                          ~decision-options
-                                          ~decision-defaults
-                                          ~(or (first app-config) {}))]
-     (def ~(quote collection) (:collection resources#))
-     (def ~(quote entry) (:entry resources#))))
-
-(defn resource-app
-  [path resource-decision-generator decision-options decision-defaults & app-config]
+(defnpd resource-app
+  [path resource-decision-generator [decision-options {}] [decision-defaults shared/default-decisions] [app-config nil]]
   (let [resources (g/generate-resources resource-decision-generator
                                         decision-options
                                         decision-defaults

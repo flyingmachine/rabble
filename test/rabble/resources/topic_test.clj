@@ -18,10 +18,7 @@
 
 (defn test-app
   []
-  (resource-app "/topics"
-                topic/resource-decisions
-                topic-options
-                shared/default-decisions))
+  (resource-app "/topics" topic/resource-decisions topic-options))
 
 (fact "query returns topics and pagination info"
   (let [data (app-data test-app :get "/topics")]

@@ -18,10 +18,7 @@
 
 (defn test-app
   []
-  (resource-app "/likes"
-                like/resource-decisions
-                {}
-                shared/default-decisions))
+  (resource-app "/likes" like/resource-decisions))
 
 (fact "creating a like results in success"
   (let [response (app-req test-app :post "/likes" {:post-id (post-id)} (auth "flyingmachine"))]

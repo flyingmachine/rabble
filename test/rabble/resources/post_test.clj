@@ -20,10 +20,7 @@
 
 (defn test-app
   []
-  (resource-app "/posts"
-                post/resource-decisions
-                post-options
-                shared/default-decisions))
+  (resource-app "/posts" post/resource-decisions post-options))
 
 (facts "creation"
   (fact "a valid post with a valid user results in success"

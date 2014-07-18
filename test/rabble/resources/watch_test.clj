@@ -19,10 +19,7 @@
 
 (defn test-app
   []
-  (resource-app "/watches"
-                watch/resource-decisions
-                {}
-                shared/default-decisions))
+  (resource-app "/watches" watch/resource-decisions))
 
 (fact "creating a watch results in success"
   (let [auth (auth "joebob")
