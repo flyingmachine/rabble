@@ -5,8 +5,6 @@
             [rabble.db.maprules :as mr]
             [rabble.db.mapification :refer :all]
             [rabble.resources.shared :refer :all]
-            [rabble.email.sending.notifications :as n]
-            [flyingmachine.cartographer.core :as c]
             [com.flyingmachine.datomic-junk :as dj]
             [flyingmachine.webutils.utils :refer :all]))
 
@@ -42,7 +40,13 @@
   [options defaults app-config]
   (merge-decision-defaults
    ;; TODO for post maybe use a different mapifier including posts?
-   {:show {:exists? (fn [ctx]
+   {:list {:handle-ok (fn [ctx]
+                        (user-sort (map (-> options :list :user-mapifier)
+                                        (dj/all :user/username))))}
+    ;; The request will reach here after going through the
+    ;; "attempt-registration" auth workflow
+    :create {:handle-ok auth}
+    :show {:exists? (fn [ctx]
                       (if-let [r ((exists? (-> options :show :user-mapifier)) ctx)]
                         (assoc-in r
                                   [:record :posts]
@@ -51,12 +55,8 @@
                                          (-> options :show :post-mapifier)
                                          app-config))))
            :handle-ok record-in-ctx}
-    :list {:handle-ok (fn [ctx]
-                        (user-sort (map (-> options :list :user-mapifier)
-                                        (dj/all :user/username))))}
     :update {:malformed? (fn [ctx] ((validator (validations/email-update (auth ctx))) ctx))
-             :authorized? (fn [ctx] (= (:id (auth ctx))
-                                      (ctx-id ctx)))
+             :authorized? current-user-id
              :exists? (fn [ctx] (dj/ent (ctx-id ctx)))
              :put! (fn [ctx]
                      (dj/t [[:db/retract (ctx-id ctx) :user/preferences tx/preferences]])

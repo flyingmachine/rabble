@@ -152,3 +152,7 @@
   (merge-with merge
               (select-keys defaults (keys decisions))
               decisions))
+
+(defn current-user-id?
+  [ctx]
+  (= (ctx-id ctx) (:id (auth ctx))))
