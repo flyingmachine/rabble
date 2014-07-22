@@ -62,7 +62,12 @@
 
 (def exists-in-ctx? record-in-ctx)
 
+(defn current-user-id?
+  [ctx]
+  (= (ctx-id ctx) (:id (auth ctx))))
+
 (defn mapify-rest
+  "Mapify all but the first item; used for pagination"
   [map-fn ents]
   (conj (map map-fn (rest ents))
         (first ents)))
@@ -131,6 +136,7 @@
      after-create)))
 
 (def default-decisions
+  ^{:doc "A 'base' set of liberator resource decisions for list, create, show, update, and delete. You use this with rabble.resources.generate/resource-route"}
   (let [base {:available-media-types ["application/json"]
               :allowed-methods [:get]
               :authorized? true
@@ -148,11 +154,8 @@
                           :respond-with-entity? false})}))
 
 (defn merge-decision-defaults
+  ^{:doc "This is used when defining a resource generator"}
   [decisions defaults]
   (merge-with merge
               (select-keys defaults (keys decisions))
               decisions))
-
-(defn current-user-id?
-  [ctx]
-  (= (ctx-id ctx) (:id (auth ctx))))

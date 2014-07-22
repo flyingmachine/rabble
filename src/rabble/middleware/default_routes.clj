@@ -13,7 +13,7 @@
   [sym]
   (-> sym str (clojure.string/split #"\.") last symbol))
 (doseq [ns '[topic watch watched-topic post
-             like stats user tag
+             like stats user tag password
              credential-recovery.forgot-username
              credential-recovery.forgot-password]]
   (require [(symbol (str "rabble.resources." ns)) :as (as ns)]))
@@ -32,7 +32,7 @@
                         (compojure.route/resources "/" {:root %}))
                       (config :html-paths)))))
 
-(defroutes app-routes
+(defroutes core-routes
   ^{:doc "Core rabble functionality with default resource options"}
   (GET "/scripts/load-session.js"
        {:keys [params] :as req}
@@ -65,9 +65,14 @@
 
 (defroutes credential-routes
   ^{:doc ""}
+  (ANY "/users/:id/password"
+       {:keys [params] :as req}
+       (password/change-password! params (friend/current-authentication req)))
+  
   (g/resource-route "/credential-recovery/forgot-username"
                     forgot-username/resource-decisions)
   (g/resource-route "/credential-recovery/forgot-password"
                     forgot-username/resource-decisions
                     :entry-key :token))
 
+(def app-routes (routes static-routes core-routes credential-routes))

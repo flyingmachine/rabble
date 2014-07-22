@@ -65,12 +65,15 @@
   (resource-for-keys resource-configs :list :create))
 
 (defn generate-resources
+  "Produces a collection resource meant for querying and create and an
+  entry resource meant for show, update, delete"
   [resource-decision-generator decision-options decision-defaults app-config]
   (let [resource-configs (resource-decision-generator decision-options decision-defaults app-config)]
     {:collection (collection-resource resource-configs)
      :entry (entry-resource resource-configs)}))
 
 (defn resource-route
+  "Creates a route for collection and entry resources"
   [path
    resource-decision-generator
    & {:keys [decision-options decision-defaults entry-key app-config]
