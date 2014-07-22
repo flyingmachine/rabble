@@ -63,7 +63,8 @@
   (POST "/login" {params :params} (session/create! params))
   (friend/logout (ANY "/logout" [] (ring.util.response/redirect "/"))))
 
-(defroutes auth-routes
+(defroutes credential-routes
+  ^{:doc ""}
   (g/resource-route "/credential-recovery/forgot-username"
                     forgot-username/resource-decisions)
   (g/resource-route "/credential-recovery/forgot-password"
