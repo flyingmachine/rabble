@@ -8,7 +8,7 @@
         ring.middleware.format
         ring.middleware.anti-forgery
         [compojure.core :as compojure]
-        [rabble.middleware.routes :only (rabble-routes auth-routes)]
+        [rabble.middleware.default-routes :only (app-routes)]
         [rabble.middleware.auth :only (auth)]
         [rabble.middleware.logging :only (wrap-exception)]
         [rabble.middleware.db-session-store :only (db-session-store)]
@@ -22,6 +22,7 @@
     (f request)))
 
 (defn wrap
+  "All the default middlewares needed to make rabble work"
   [to-wrap]
   (-> to-wrap
       wrap-anti-forgery
@@ -33,13 +34,7 @@
       wrap-nested-params
       wrap-params))
 
-(defnpd site
-  [[middlewares []] [routes []]]
-  (let [router (apply compojure/routes (concat routes [rabble-routes]))
-        stack (into [router] (concat (reverse middlewares) [wrap]))]
-    (reduce #(%2 %1) stack)))
-
-(def app (site [auth] [auth-routes]))
+(def app (wrap app-routes))
 
 (defn start
   "Start the jetty server"
