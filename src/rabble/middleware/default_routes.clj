@@ -57,7 +57,7 @@
    (g/resource-route "/watched-topics"
                      watched-topic/resource-decisions
                      :decision-options (:watched-topic resource-options))
-   (g/resource-route "/like"
+   (g/resource-route "/likes"
                      like/resource-decisions)
    (g/resource-route "/stats"
                      stats/resource-decisions)
