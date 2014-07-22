@@ -1,4 +1,4 @@
-(defproject rabble "0.2.0-SNAPSHOT"
+(defproject rabble "0.2.0"
   :description "forum api"
   :url "https://github.com/flyingmachine/rabble"
   :license {:name "MIT"
