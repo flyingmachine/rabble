@@ -4,14 +4,6 @@
             [rabble.config :as app-config]
             [rabble.resources.shared :as shared]))
 
-(def todo nil)
-
-(def resource-options
-  {:post {:list {:mapifier todo}
-          :create {:validation-rules todo
-                   :authorized? todo}
-          :update {:validation-rules todo}}})
-
 (defn method-resource-map
   [config-map]
   (reduce (fn [result [k v]]
