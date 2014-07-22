@@ -1,5 +1,5 @@
-(ns rabble.db.transactions.t-posts
-  (:require [rabble.test.db-helpers :as tdb]
+(ns rabble.db.transactions.posts-test
+  (:require [rabble.test.db-helpers :refer :all]
             [rabble.db.maprules :as mr]
             [rabble.db.mapification :refer :all]
             [flyingmachine.cartographer.core :as c]
@@ -7,8 +7,7 @@
             [rabble.db.transactions.posts :as p]
             [rabble.db.transactions.topics :as t]
             [rabble.db.transactions.watches :as w])
-  (:use midje.sweet
-        rabble.test.controller-helpers))
+  (:use midje.sweet))
 
 (setup-db-background
  (t/create-topic {:author-id (:id (auth))

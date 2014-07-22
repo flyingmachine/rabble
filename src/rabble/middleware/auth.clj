@@ -5,7 +5,6 @@
             [rabble.db.maprules :as mr]
             [rabble.db.mapification :refer :all]
             [rabble.db.transactions.users :as tx]
-            [rabble.controllers.shared :refer :all]
             [flyingmachine.webutils.validation :refer :all]
             [cemerick.friend :as friend]
             (cemerick.friend [workflows :as workflows]
@@ -44,7 +43,8 @@
        (workflows/make-auth
         (mapify-tx-result (tx/create-user params) user)
         {:cemerick.friend/redirect-on-auth? false})
-       (invalid errors)))))
+       {:body {:errors errors}
+        :status 412}))))
 
 (defn auth
   [ring-app]

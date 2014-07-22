@@ -65,7 +65,7 @@
                      tag/resource-decisions
                      :decision-options (:tag resource-options))
 
-   (POST "/login" {params :params} (session/create! params))
+   (POST "/login" {:keys [] :as req} (session/create! req))
    (friend/logout (ANY "/logout" [] (ring.util.response/redirect "/")))))
 
 (def core-routes

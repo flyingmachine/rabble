@@ -1,14 +1,11 @@
 (ns rabble.test.resource-helpers
   (:require [com.flyingmachine.datomic-junk :as dj]
-            [rabble.test.db-helpers :as tdb]
-            [rabble.db.tasks :as db-tasks]
-            [rabble.ring-app :as ra]
-            [rabble.middleware.routes :as ar]
             [rabble.middleware.auth :as am]
             [clojure.data.json :as json]
             [compojure.core :as compojure]
             [rabble.resources.shared :as shared]
-            [rabble.resources.generate :as g])
+            [rabble.resources.generate :as g]
+            [rabble.test.db-helpers :refer :all])
   (:use midje.sweet
         flyingmachine.webutils.utils
         rabble.paths
@@ -51,12 +48,6 @@
                  (compojure/ANY path [] (:collection resources))
                  (compojure/ANY (str path "/" entry-key) [] (:entry resources))))))
 
-(defn auth
-  ([] (auth "flyingmachine"))
-  ([username]
-     {:id (:db/id (dj/one [:user/username username]))
-      :username username}))
-
 (defn authenticated
   [request auth]
   (if auth
@@ -88,19 +79,6 @@
 (defnpd app-data
   [app method url [params nil] [auth nil]]
   (data (app-req app method url params auth)))
-
-(defn reload
-  []
-  (db-tasks/reload)
-  (dj/t (read-resource "fixtures/seeds.edn")))
-
-(defmacro setup-db-background
-  [& before]
-  `(background
-    (before :contents (tdb/with-test-db
-                        (reload)
-                        ~@before))
-    (around :facts (tdb/with-test-db ?form))))
 
 (defn content-id
   ([content-attribute] (content-id content-attribute "flyingmachine"))
