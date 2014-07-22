@@ -40,8 +40,8 @@
   [resource-options]
   (routes
    (GET "/scripts/load-session.js"
-        {:keys [params] :as req}
-        (ls/load-session params (friend/current-authentication req)))
+        {:keys [] :as req}
+        (ls/load-session (friend/current-authentication req)))
 
    (g/resource-route "/topics"
                      topic/resource-decisions
@@ -90,4 +90,4 @@
 
 (def app-routes
   ^{:doc "All the default routes"}
-  (routes static-routes core-routes credential-routes))
+  (routes core-routes credential-routes static-routes))

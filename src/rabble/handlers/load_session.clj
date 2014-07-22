@@ -14,7 +14,7 @@
    :headers {"content-type" "application/javascript"}})
 
 (defn load-session
-  [params auth]
+  [auth]
   (let [af-token {:anti-forgery-token af/*anti-forgery-token*}
         session (json/write-str (if auth
                                   (merge (select-keys auth session-user-keys)
