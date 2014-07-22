@@ -1,6 +1,8 @@
 (ns rabble.resources.generate
   (:require [liberator.core :refer [resource default-functions]]
-            [com.flyingmachine.config :as config]))
+            [compojure.core :refer (ANY routes)]
+            [rabble.config :as app-config]
+            [rabble.resources.shared :as shared]))
 
 (def todo nil)
 
@@ -67,3 +69,19 @@
   (let [resource-configs (resource-decision-generator decision-options decision-defaults app-config)]
     {:collection (collection-resource resource-configs)
      :entry (entry-resource resource-configs)}))
+
+(defn resource-route
+  [path
+   resource-decision-generator
+   & {:keys [decision-options decision-defaults entry-key app-config]
+      :or {decision-options {}
+           decision-defaults shared/default-decisions
+           entry-key ":id"
+           app-config app-config/config}}]
+  (let [resources (generate-resources resource-decision-generator
+                                      decision-options
+                                      decision-defaults
+                                      app-config)]
+    (routes
+     (ANY path [] (:collection resources))
+     (ANY (str path "/" entry-key) [] (:entry resources)))))

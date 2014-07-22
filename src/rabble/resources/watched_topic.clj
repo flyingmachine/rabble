@@ -33,3 +33,6 @@
                                    (or (app-config :per-page) 50)
                                    (params ctx))))}}
    defaults))
+
+(def default-options
+  {:list {:mapifier topic}})

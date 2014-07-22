@@ -69,7 +69,7 @@
 
 (defupdate!
   :invalid? (validator params (validations/email-update auth))
-  :authorized? (current-user-id? (id) auth)
+  :authorized? (= (id) (:id auth))
   :exists? (fn [_] (dj/ent (id)))
   :put! (fn [_] (update!* params))
   :return (mapify-with user))
