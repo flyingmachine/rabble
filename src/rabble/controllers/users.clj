@@ -93,6 +93,6 @@
                  ctx))
   :handle-malformed errors-in-ctx
   
-  :authorized? (fn [_] (current-user-id? (id) auth))
+  :authorized? (fn [_] (= (id) (:id auth)))
   
   :post! (fn [_] (dj/t [(c/mapify params mr/change-password->txdata)])))

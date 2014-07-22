@@ -9,11 +9,9 @@
 
 (setup-db-background)
 
-(def topic-options
-  {:list {:mapifier topic/list-topic}
-   :create {:validation validations/topic
-            :after-create (fn [ctx record])}
-   :show {:mapifier topic/topic}})
+(def topic-options (assoc-in topic/default-options
+                             [:create :after-create]
+                             (fn [ctx record])))
 
 (defn test-app
   []

@@ -10,12 +10,9 @@
 
 (setup-db-background)
 
-(def post-options
-  {:list {:mapifier post/post}
-   :create {:validation (:create validations/post)
-            :after-create (fn [ctx record])}
-   :update {:validation (:update validations/post)}
-   :show {:mapifier post/post}})
+(def post-options (assoc-in post/default-options
+                            [:create :after-create]
+                            (fn [ctx record])))
 
 (defn test-app
   []

@@ -32,36 +32,49 @@
                         (compojure.route/resources "/" {:root %}))
                       (config :html-paths)))))
 
-(defroutes core-routes
+
+(defn build-core-routes
+  "This provides an easy way to customize the options for
+  resources. For more extensive customization, you'll need to write
+  things out in your host project."
+  [resource-options]
+  (routes
+   (GET "/scripts/load-session.js"
+        {:keys [params] :as req}
+        (ls/load-session params (friend/current-authentication req)))
+
+   (g/resource-route "/topics"
+                     topic/resource-decisions
+                     :decision-options (:topic resource-options))
+   (g/resource-route "/posts"
+                     post/resource-decisions
+                     :decision-options (:post resource-options))
+   (g/resource-route "/users"
+                     user/resource-decisions
+                     :decision-options (:user resource-options))
+   (g/resource-route "/watches"
+                     watch/resource-decisions)
+   (g/resource-route "/watched-topics"
+                     watched-topic/resource-decisions
+                     :decision-options (:watched-topic resource-options))
+   (g/resource-route "/like"
+                     like/resource-decisions)
+   (g/resource-route "/stats"
+                     stats/resource-decisions)
+   (g/resource-route "/tags"
+                     tag/resource-decisions
+                     :decision-options (:tag resource-options))
+
+   (POST "/login" {params :params} (session/create! params))
+   (friend/logout (ANY "/logout" [] (ring.util.response/redirect "/")))))
+
+(def core-routes
   ^{:doc "Core rabble functionality with default resource options"}
-  (GET "/scripts/load-session.js"
-       {:keys [params] :as req}
-       (ls/load-session params (friend/current-authentication req)))
-
-  (g/resource-route "/topics"
-                    topic/resource-decisions
-                    :decision-options topic/default-options)
-  (g/resource-route "/posts"
-                    post/resource-decisions
-                    :decision-options post/default-options)
-  (g/resource-route "/users"
-                    user/resource-decisions
-                    :decision-options user/default-options)
-  (g/resource-route "/watches"
-                    watch/resource-decisions)
-  (g/resource-route "/watched-topics"
-                    watched-topic/resource-decisions
-                    :decision-options watched-topic/default-options)
-  (g/resource-route "/like"
-                    like/resource-decisions)
-  (g/resource-route "/stats"
-                    stats/resource-decisions)
-  (g/resource-route "/tags"
-                    tag/resource-decisions
-                    :decision-options tag/default-options)
-
-  (POST "/login" {params :params} (session/create! params))
-  (friend/logout (ANY "/logout" [] (ring.util.response/redirect "/"))))
+  (build-core-routes {:topic topic/default-options
+                      :post post/default-options
+                      :user user/default-options
+                      :watched-topic watched-topic/default-options
+                      :tag tag/default-options}))
 
 (defroutes credential-routes
   ^{:doc ""}
@@ -75,4 +88,6 @@
                     forgot-username/resource-decisions
                     :entry-key :token))
 
-(def app-routes (routes static-routes core-routes credential-routes))
+(def app-routes
+  ^{:doc "All the default routes"}
+  (routes static-routes core-routes credential-routes))
