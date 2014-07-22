@@ -1,5 +1,6 @@
 (ns rabble.config
-  (require [com.flyingmachine.config :as config]))
+  (require [com.flyingmachine.config :as config]
+           [environ.core]))
 
 (config/defconfig
   config

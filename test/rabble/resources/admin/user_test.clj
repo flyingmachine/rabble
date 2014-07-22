@@ -8,12 +8,9 @@
 
 (setup-db-background)
 
-(def user-options
-  {:list {:mapifier user/user}})
-
 (defn test-app
   []
-  (resource-app "/admin/users" user/resource-decisions user-options))
+  (resource-app "/admin/users" user/resource-decisions user/default-options))
 
 (fact "an admin gets a list of users"
   (count (app-data test-app :get "/admin/users" nil (auth)))

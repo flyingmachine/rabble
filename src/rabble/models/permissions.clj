@@ -21,6 +21,14 @@
 (defn logged-in? [auth]
   auth)
 
+(defn current-user-id?
+  [id auth]
+  (= id (current-user-id auth)))
+
+(defn not-current-user-id?
+  [id auth]
+  (not (current-user-id? id auth)))
+
 (defn can-modify-profile?
   [user auth]
   (or

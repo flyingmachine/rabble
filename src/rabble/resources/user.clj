@@ -56,7 +56,7 @@
                                          app-config))))
            :handle-ok record-in-ctx}
     :update {:malformed? (fn [ctx] ((validator (validations/email-update (auth ctx))) ctx))
-             :authorized? current-user-id
+             :authorized? current-user-id?
              :exists? (fn [ctx] (dj/ent (ctx-id ctx)))
              :put! (fn [ctx]
                      (dj/t [[:db/retract (ctx-id ctx) :user/preferences tx/preferences]])
