@@ -12,8 +12,7 @@
         [rabble.middleware.auth :only (auth)]
         [rabble.middleware.logging :only (wrap-exception)]
         [rabble.middleware.db-session-store :only (db-session-store)]
-        [rabble.config :only (config)]
-        [flyingmachine.webutils.utils :only (defnpd)]))
+        [rabble.config :only (config)]))
 
 (defn debug-middleware
   [f]
