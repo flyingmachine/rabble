@@ -36,6 +36,15 @@
                (:username user)))
            users))
 
+;; TODO combine two transactions?
+(defn update-user
+  [options ctx]
+  (dj/t [[:db/retract
+          (ctx-id ctx)
+          :user/preferences
+          (-> options :update :preference-list)]])
+  (dj/t [(remove-nils-from-map ((-> options :update :update-mapifier) (params ctx)))]))
+
 (defn resource-decisions
   [options defaults app-config]
   (merge-decision-defaults
@@ -58,13 +67,14 @@
     :update {:malformed? (fn [ctx] ((validator (validations/email-update (auth ctx))) ctx))
              :authorized? current-user-id?
              :exists? (fn [ctx] (dj/ent (ctx-id ctx)))
-             :put! (fn [ctx]
-                     (dj/t [[:db/retract (ctx-id ctx) :user/preferences tx/preferences]])
-                     (dj/t [(remove-nils-from-map (user->txdata (params ctx)))]))
+             :put! (partial update-user options)
              :handle-ok (mapify-with (-> options :show :user-mapifier))}}
    defaults))
 
+;; TODO should preference-list be an app config option?
 (def default-options
   {:list {:user-mapifier user}
+   :update {:update-mapifier user->txdata
+            :preference-list tx/preferences}
    :show {:user-mapifier user
           :post-mapifier post}})
