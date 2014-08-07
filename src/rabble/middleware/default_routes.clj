@@ -85,7 +85,7 @@
   (g/resource-route "/credential-recovery/forgot-username"
                     forgot-username/resource-decisions)
   (g/resource-route "/credential-recovery/forgot-password"
-                    forgot-username/resource-decisions
+                    forgot-password/resource-decisions
                     :entry-key :token))
 
 (def app-routes

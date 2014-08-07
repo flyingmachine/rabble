@@ -12,6 +12,7 @@
 (defn resource-decisions
   [options defaults app-config]
   (merge-decision-defaults
+   defaults
    {:list {:handle-ok (fn [ctx]
                         (map (comp watch first)
                              (d/q '[:find ?watch
@@ -30,5 +31,4 @@
                               (if (and watch (= (:db/id (:watch/user watch))
                                                 (:id (auth ctx))))
                                 {:record watch-id})))
-             :delete! (fn [ctx] (dj/retract (:record ctx)))}}
-   defaults))
+             :delete! (fn [ctx] (dj/retract (:record ctx)))}}))

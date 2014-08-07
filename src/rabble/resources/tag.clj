@@ -12,12 +12,12 @@
 (defn resource-decisions
   [options defaults app-config]
   (merge-decision-defaults
+   defaults
    {:list {:handle-ok (fn [_]
                         (->> :tag/name
                              dj/all
                              (map (-> options :list :mapifier))
-                             (sort-by :name)))}}
-   defaults))
+                             (sort-by :name)))}}))
 
 (def default-options
   {:list {:mapifier tag}})

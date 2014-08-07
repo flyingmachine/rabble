@@ -37,7 +37,8 @@
 
 (defn errors-in-ctx
   [ctx]
-  (select-keys ctx [:errors]))
+  {:errors (:errors ctx)
+   :representation {:media-type "application/json"}})
 
 (defn validator
   "Used in invalid? which is why truth values are reversed"
@@ -155,7 +156,7 @@
 
 (defn merge-decision-defaults
   ^{:doc "This is used when defining a resource generator"}
-  [decisions defaults]
+  [defaults decisions]
   (merge-with merge
               (select-keys defaults (keys decisions))
               decisions))

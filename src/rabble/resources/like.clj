@@ -18,6 +18,7 @@
 (defn resource-decisions
   [options defaults app-config]
   (merge-decision-defaults
+   defaults
    {:create {:authorized? ctx-logged-in?
              :post! (fn [ctx]
                       (let [like-params (clean-params ctx)]
@@ -28,5 +29,4 @@
                             (if-let [like (find-like (dissoc (clean-params ctx) :db/id))]
                               {:record (:db/id like)}
                               [false auth-error]))
-             :delete! (fn [ctx] @(dj/retract (:record ctx)))}}
-   defaults))
+             :delete! (fn [ctx] @(dj/retract (:record ctx)))}}))

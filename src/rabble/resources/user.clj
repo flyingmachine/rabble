@@ -48,6 +48,7 @@
 (defn resource-decisions
   [options defaults app-config]
   (merge-decision-defaults
+   defaults
    ;; TODO for post maybe use a different mapifier including posts?
    {:list {:handle-ok (fn [ctx]
                         (user-sort (map (-> options :list :user-mapifier)
@@ -68,8 +69,7 @@
              :authorized? current-user-id?
              :exists? (fn [ctx] (dj/ent (ctx-id ctx)))
              :put! (partial update-user options)
-             :handle-ok (mapify-with (-> options :show :user-mapifier))}}
-   defaults))
+             :handle-ok (mapify-with (-> options :show :user-mapifier))}}))
 
 ;; TODO should preference-list be an app config option?
 (def default-options

@@ -9,6 +9,7 @@
 (defn resource-decisions
   [options defaults app-config]
   (merge-decision-defaults
+   defaults
    {:show {:malformed? (validator validations/password-reset-token)
            :respond-with-entity? false
            :handle-ok {}}
@@ -36,5 +37,4 @@
              :put! (fn [ctx] (tx/consume-token (:record ctx) (:new-password (params ctx))))
              :new? false
              :respond-with-entity? false
-             :handle-ok {}}}
-   defaults))
+             :handle-ok {}}}))

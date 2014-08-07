@@ -37,6 +37,7 @@
 (defn resource-decisions
   [options defaults app-config]
   (merge-decision-defaults
+   defaults
    {:list {:handle-ok (fn [{{params :params} :request}]
                         (mapify-rest
                          (-> options :list :mapifier)
@@ -53,8 +54,7 @@
              :put! (update-record tx/update-post)
              :handle-ok (mapify-with (-> options :show :mapifier))}
     :delete {:authorized? (can-delete-record? (-> options :show :mapifier))
-             :delete! delete-record-in-ctx}}
-   defaults))
+             :delete! delete-record-in-ctx}}))
 
 (def default-options
   {:list {:mapifier post}

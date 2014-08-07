@@ -12,9 +12,9 @@
 (defn resource-decisions
   [options defaults app-config]
   (merge-decision-defaults
+   defaults
    {:list {:authorized? (fn [ctx] (moderator? (auth ctx)))
-           :handle-ok (fn [_] (map (-> options :list :mapifier) (dj/all :user/username)))}}
-   defaults))
+           :handle-ok (fn [_] (map (-> options :list :mapifier) (dj/all :user/username)))}}))
 
 (def default-options
   {:list {:mapifier user}})
